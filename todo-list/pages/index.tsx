@@ -1,3 +1,4 @@
+import axios from "axios";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import TodoItemComponent from "../components/TodoItemComponent";
@@ -6,30 +7,42 @@ import { TodoAPI, TodoModel } from "../types/Todo";
 
 const Home: NextPage = () => {
   const [todos, setTodos] = useState<TodoModel[]>([]);
+  const [addTodo, setAddTodo] = useState<TodoModel>({} as TodoModel);
 
   const getTodos = () => {
-    /*
-    fetch("http://localhost:8080/todos")
-      .then((res) => res.json())
-      .then((data: TodoAPI[]) => {
-        setTodos(data);
+    axios.get<TodoAPI[]>("http://localhost:8080/todos").then((todosAPI) => {
+      const todosModel: TodoModel[] = todosAPI.data.map((todoAPI) => {
+        return {
+          id: todoAPI.ID,
+          name: todoAPI.Name,
+          description: todoAPI.Description,
+          status: todoAPI.Status ?? false,
+        } as TodoModel;
       });
-      */
 
-    setTodos(mockTodos);
+      setTodos([...todosModel]);
+    });
+
+    //setTodos(mockTodos);
   };
 
   useEffect(() => {
     getTodos();
-  });
+  }, []);
 
   const handleTodoItemChange = (item: TodoModel) => {
     item.status = !item.status;
     setTodos([...todos]);
   };
 
+  const handleAddTodoClick = () => {
+    axios
+      .post<TodoAPI>("http://localhost:8080/todos", addTodo)
+      .then((res) => console.log(res));
+  };
+
   return (
-    <div className="flex justify-center">
+    <div className="flex flex-col items-center">
       <ul className="mt-8">
         {todos.map((todo) => (
           <TodoItemComponent
@@ -39,6 +52,66 @@ const Home: NextPage = () => {
           />
         ))}
       </ul>
+
+      <div className="mt-8">
+        <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="name"
+            >
+              Name
+            </label>
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="name"
+              type="text"
+              placeholder="Name..."
+              value={addTodo.name}
+              onChange={(e) => (addTodo.name = e.currentTarget.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="description"
+            >
+              Description
+            </label>
+            <textarea
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="description"
+              placeholder="Description..."
+              value={addTodo.description}
+              onChange={(e) => (addTodo.description = e.currentTarget.value)}
+            />
+          </div>
+          <div className="mb-6">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="status"
+            >
+              Status
+            </label>
+            <input
+              className="shadow w-6 h-6 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              id="status"
+              type="checkbox"
+              checked={addTodo.status}
+              onChange={() => (addTodo.status = !addTodo.status)}
+            />
+          </div>
+          <div className="flex justify-center">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="button"
+              onClick={handleAddTodoClick}
+            >
+              Add Todo
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

@@ -4,13 +4,15 @@ export enum TodoStatus {
 }
 
 export interface TodoAPI {
-  id: number;
-  title: string;
-  status: TodoStatus;
+  ID: number;
+  Name: string;
+  Description: string;
+  Status: boolean;
 }
 
 export interface TodoModel {
   id: number;
-  title: string;
+  name: string;
+  description: string;
   status: boolean;
 }

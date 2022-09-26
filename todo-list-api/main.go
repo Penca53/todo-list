@@ -15,9 +15,9 @@ type todo struct {
 }
 
 var todos = []todo{
-	/*{ID: 0, Name: "Code", Description: "Just code"},
+	{ID: 0, Name: "Code", Description: "Just code"},
 	{ID: 1, Name: "Gaming", Description: "Just play"},
-	{ID: 2, Name: "Sleep", Description: "Just sleep"},*/
+	{ID: 2, Name: "Sleep", Description: "Just sleep"},
 }
 
 func getTodos(c *gin.Context) {
