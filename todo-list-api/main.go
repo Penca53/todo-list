@@ -9,16 +9,14 @@ import (
 )
 
 type todo struct {
-	ID int //`json:"ID"`
+	ID int
 	Name string `json:"Name"`
 	Description string `json:"Description"`
+	Status bool `json:"Status"`
 }
 
-var todos = []todo{
-	{ID: 0, Name: "Code", Description: "Just code"},
-	{ID: 1, Name: "Gaming", Description: "Just play"},
-	{ID: 2, Name: "Sleep", Description: "Just sleep"},
-}
+var todos = []todo{}
+var LastID int = 0;
 
 func getTodos(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, todos)
@@ -55,8 +53,6 @@ func addTodo(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, newTodo)
 }
-
-var LastID int = 0;
 
 func main() {
 	router := gin.Default()
