@@ -2,27 +2,61 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-type album struct {
-	ID     string  `json:"id"`
-	Title  string  `json:"title"`
-	Artist string  `json:"artist"`
-	Price  float64 `json:"price"`
+type todo struct {
+	ID int //`json:"ID"`
+	Name string `json:"Name"`
+	Description string `json:"Description"`
 }
 
-var albums = []album{
-	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+var todos = []todo{
+	/*{ID: 0, Name: "Code", Description: "Just code"},
+	{ID: 1, Name: "Gaming", Description: "Just play"},
+	{ID: 2, Name: "Sleep", Description: "Just sleep"},*/
 }
 
-func getAlbums(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, albums)
+func getTodos(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, todos)
 }
+
+func getTodoByID(c *gin.Context) {
+	ID, err := strconv.Atoi(c.Param("ID"))
+
+	if err != nil {
+		return
+	}
+
+	for _, a := range todos {
+			if a.ID == ID {
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Todo not found"})
+}
+
+func addTodo(c *gin.Context) {
+	var newTodo todo;
+
+	if err := (c.BindJSON(&newTodo)); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error in creating todo": err.Error()})
+    	return
+    }
+	
+	newTodo.ID = LastID
+	todos = append(todos, newTodo);
+	LastID++
+
+	c.IndentedJSON(http.StatusOK, newTodo)
+}
+
+var LastID int = 0;
 
 func main() {
 	router := gin.Default()
@@ -31,7 +65,9 @@ func main() {
 	config.AllowOrigins = []string{"http://localhost:3000"}
 
 	router.Use(cors.New(config))
-	router.GET("/albums", getAlbums)
+	router.GET("/todos", getTodos)
+	router.GET("/todos:ID", getTodoByID)
+	router.POST("/todos", addTodo)
 
 	router.Run("localhost:8080")
 }
