@@ -31,7 +31,6 @@ const Home: NextPage = () => {
   }, []);
 
   const handleTodoItemChange = (item: TodoModel) => {
-    item.status = !item.status;
     const prevStatus = item.status;
 
     // Prediction
@@ -40,7 +39,7 @@ const Home: NextPage = () => {
 
     // API acknowledge
     axios
-      .patch(`http://localhost:8080/todos?id=${item.id}`, {
+      .patch(`http://localhost:8080/todos/${item.id}`, {
         status: item.status,
       })
       .catch((err) => {
