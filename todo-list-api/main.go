@@ -20,13 +20,18 @@ import (
 type Todo struct {	
 	ID uint `gorm:"primaryKey" json:"ID" binding:"required"`
 	Name string `gorm:"notNull" json:"Name" binding:"required"`
-	Description string `json:"Description"`
+	Description string `json:"description"`
 	Status bool `json:"Status"`
 }
 
 type AddTodoRequest struct {	
 	Name string `json:"name"`
 	Description string `json:"description"`
+	Status bool `json:"status"`
+}
+
+type UpdateTodoStatusRequest struct {
+	ID uint `json:"ID"`
 	Status bool `json:"status"`
 }
 
@@ -100,7 +105,7 @@ func addTodo(c *gin.Context) {
 	var newTodo AddTodoRequest;
 
 	if err := (c.BindJSON(&newTodo)); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error in creating todo": err.Error()})
+        c.JSON(http.StatusBadRequest, gin.H{"error in binding newTodo": err.Error()})
     	return
     }
 
@@ -109,7 +114,6 @@ func addTodo(c *gin.Context) {
 		print(err)
 	}
 
-	//todos = append(todos, newTodo);
 	var todo Todo;
 	todo.Name = newTodo.Name;
 	todo.Description = newTodo.Description;
@@ -125,6 +129,54 @@ func addTodo(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, todo)
+}
+
+func uptadeTodoStatus(c *gin.Context) {
+	var newStatus UpdateTodoStatusRequest
+
+	if err := (c.BindJSON(&newStatus)); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error in binding todo status": err.Error()})
+    	return
+    }
+
+	db, conErr := getDatabaseConnection()
+	if conErr != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"message": "Service is unavailable",
+		})
+		return
+	}
+
+	var value Todo
+
+	result := db.First(&value, "id = ?", newStatus.ID)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "Record not found",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Error occurred while updating todo",
+			})
+		}
+		return
+	}
+
+	value.Status = newStatus.Status
+
+	tx := db.Save(value)
+	if tx.RowsAffected != 1 {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Error occurred while updating user",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Todo status updated successfully",
+		"result":  value,
+	})
 }
 
 func getDsn() string {
@@ -210,6 +262,7 @@ func main() {
 	router.GET("/todos", getTodos)
 	router.GET("/todos/:ID", getTodoByID)
 	router.POST("/todos", addTodo)
+	router.PATCH("/todos/:ID", uptadeTodoStatus)
 
 	router.Run("localhost:8080")
 }
