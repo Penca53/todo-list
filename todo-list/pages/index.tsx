@@ -38,7 +38,7 @@ const Home: NextPage = () => {
   const handleAddTodoClick = () => {
     axios
       .post<TodoAPI>("http://localhost:8080/todos", addTodo)
-      .then((res) => console.log(res));
+      .then((res) => getTodos());
   };
 
   return (
@@ -68,7 +68,12 @@ const Home: NextPage = () => {
               type="text"
               placeholder="Name..."
               value={addTodo.name}
-              onChange={(e) => (addTodo.name = e.currentTarget.value)}
+              onChange={(e) => {
+                setAddTodo((prevState) => ({
+                  ...prevState,
+                  name: e.target.value,
+                }));
+              }}
             />
           </div>
           <div className="mb-4">
@@ -83,7 +88,12 @@ const Home: NextPage = () => {
               id="description"
               placeholder="Description..."
               value={addTodo.description}
-              onChange={(e) => (addTodo.description = e.currentTarget.value)}
+              onChange={(e) => {
+                setAddTodo((prevState) => ({
+                  ...prevState,
+                  description: e.target.value,
+                }));
+              }}
             />
           </div>
           <div className="mb-6">
@@ -98,7 +108,12 @@ const Home: NextPage = () => {
               id="status"
               type="checkbox"
               checked={addTodo.status}
-              onChange={() => (addTodo.status = !addTodo.status)}
+              onChange={() => {
+                setAddTodo((prevState) => ({
+                  ...prevState,
+                  status: !prevState.status,
+                }));
+              }}
             />
           </div>
           <div className="flex justify-center">
