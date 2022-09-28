@@ -3,6 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
 
 	"net/http"
 
@@ -13,11 +17,17 @@ import (
 	"gorm.io/gorm"
 )
 
-type todo struct {	
+type Todo struct {	
 	ID uint `gorm:"primaryKey" json:"ID" binding:"required"`
 	Name string `gorm:"notNull" json:"Name" binding:"required"`
 	Description string `json:"Description"`
 	Status bool `json:"Status"`
+}
+
+type AddTodoRequest struct {	
+	Name string `json:"name"`
+	Description string `json:"description"`
+	Status bool `json:"status"`
 }
 
 var user string
@@ -27,10 +37,22 @@ var host string
 var port string
 var ssl string
 var dbConn *gorm.DB
-var todos = []todo{}
-var LastID uint = 0;
 
 func getTodos(c *gin.Context) {
+	db, err := getDatabaseConnection()
+	if err != nil {
+		print(err)
+	}
+
+	//todos = append(todos, newTodo);
+	var todos []Todo
+	result := db.Find(&todos)
+
+	if result.Error != nil {
+		print(result.Error)
+		return
+	}
+
 	c.IndentedJSON(http.StatusOK, todos)
 }
 
@@ -53,7 +75,7 @@ func getTodoByID(c *gin.Context) {
 		return
 	}
 
-	var todo todo
+	var todo Todo
 	result := db.First(&todo, "ID = ?", todoId)
 	if result.Error != nil {
 		print(result.Error)
@@ -75,7 +97,7 @@ func getTodoByID(c *gin.Context) {
 }
 
 func addTodo(c *gin.Context) {	
-	var newTodo todo;
+	var newTodo AddTodoRequest;
 
 	if err := (c.BindJSON(&newTodo)); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error in creating todo": err.Error()})
@@ -88,8 +110,11 @@ func addTodo(c *gin.Context) {
 	}
 
 	//todos = append(todos, newTodo);
-	newTodo.ID = LastID
-	result := db.Create(&newTodo)
+	var todo Todo;
+	todo.Name = newTodo.Name;
+	todo.Description = newTodo.Description;
+	todo.Status = newTodo.Status;
+	result := db.Create(&todo)
 
 	if result.Error != nil && result.RowsAffected != 1 {
 		print(result.Error)
@@ -98,9 +123,8 @@ func addTodo(c *gin.Context) {
 		})
 		return
 	}
-	LastID++
 
-	c.IndentedJSON(http.StatusOK, newTodo)
+	c.IndentedJSON(http.StatusOK, todo)
 }
 
 func getDsn() string {
@@ -142,18 +166,24 @@ func autoMigrateDB() error {
 		return connErr
 	}
 
-	err := db.AutoMigrate(todo{})
+	err := db.AutoMigrate(Todo{})
  
 	return err
 }
 
 func init() {
-	user = "postgres"
-	password = ""
-	dbName = "todolistdb"
-	host = "localhost"
-	port = "5432"
-	ssl = "disable"
+	err := godotenv.Load(".env")
+
+	if err != nil {
+	  log.Fatalf("Error loading .env file")
+	}
+
+	user = os.Getenv("DB_USER")
+	password = os.Getenv("DB_PASSWORD")
+	dbName = os.Getenv("DB_NAME")
+	host = os.Getenv("DB_HOST")
+	port = os.Getenv("DB_PORT")
+	ssl = os.Getenv("DB_SSL")
 }
 
 func main() {
