@@ -32,7 +32,21 @@ const Home: NextPage = () => {
 
   const handleTodoItemChange = (item: TodoModel) => {
     item.status = !item.status;
+    const prevStatus = item.status;
+
+    // Prediction
+    item.status = !item.status;
     setTodos([...todos]);
+
+    // API acknowledge
+    axios
+      .patch(`http://localhost:8080/todos?id=${item.id}`, {
+        status: item.status,
+      })
+      .catch((err) => {
+        item.status = prevStatus;
+        setTodos([...todos]);
+      });
   };
 
   const handleAddTodoClick = () => {
