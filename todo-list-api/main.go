@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 
@@ -31,7 +32,6 @@ type AddTodoRequest struct {
 }
 
 type UpdateTodoStatusRequest struct {
-	ID uint `json:"ID"`
 	Status bool `json:"status"`
 }
 
@@ -138,6 +138,15 @@ func uptadeTodoStatus(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error in binding todo status": err.Error()})
     	return
     }
+	urlId := c.Param("ID")
+	id, _ := strconv.Atoi(urlId)
+
+	/*if err := c.ShouldBindUri(&id); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}*/
 
 	db, conErr := getDatabaseConnection()
 	if conErr != nil {
@@ -148,8 +157,8 @@ func uptadeTodoStatus(c *gin.Context) {
 	}
 
 	var value Todo
-
-	result := db.First(&value, "id = ?", newStatus.ID)
+	
+	result := db.First(&value, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
