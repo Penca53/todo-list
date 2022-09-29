@@ -19,10 +19,10 @@ import (
 )
 
 type Todo struct {	
-	ID uint `gorm:"primaryKey" json:"ID" binding:"required"`
-	Name string `gorm:"notNull" json:"Name" binding:"required"`
+	ID uint `gorm:"primaryKey" json:"id" binding:"required"`
+	Name string `gorm:"notNull" json:"name" binding:"required"`
 	Description string `json:"description"`
-	Status bool `json:"Status"`
+	Status bool `json:"status"`
 }
 
 type AddTodoRequest struct {	
@@ -138,15 +138,9 @@ func uptadeTodoStatus(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error in binding todo status": err.Error()})
     	return
     }
-	urlId := c.Param("ID")
-	id, _ := strconv.Atoi(urlId)
 
-	/*if err := c.ShouldBindUri(&id); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}*/
+	urlId := c.Param("id")
+	id, _ := strconv.Atoi(urlId)
 
 	db, conErr := getDatabaseConnection()
 	if conErr != nil {
@@ -269,9 +263,9 @@ func main() {
 
 	router.Use(cors.New(config))
 	router.GET("/todos", getTodos)
-	router.GET("/todos/:ID", getTodoByID)
+	router.GET("/todos/:id", getTodoByID)
 	router.POST("/todos", addTodo)
-	router.PATCH("/todos/:ID", uptadeTodoStatus)
+	router.PATCH("/todos/:id", uptadeTodoStatus)
 
 	router.Run("localhost:8080")
 }
