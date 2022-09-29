@@ -150,7 +150,6 @@ func updateTodoStatus(c *gin.Context) {
 	}
 
 	var value Todo
-	
 	result := db.First(&value, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -181,6 +180,44 @@ func updateTodoStatus(c *gin.Context) {
 	})
 }
 
+func deleteTodo(c *gin.Context) {
+	urlId := c.Param("ID")
+	id, _ := strconv.Atoi(urlId)
+
+	db, conErr := getDatabaseConnection()
+	if conErr != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"message": "Service is unavailable",
+		})
+		return
+	}
+
+	var value Todo
+	result := db.First(&value, "id = ?", id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"message": "Record not found",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Error occurred while updating todo",
+			})
+		}
+		return
+	}
+
+	tx := db.Delete(value)
+	if tx.RowsAffected != 1 {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Error occurred while deleting todo",
+		})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, gin.H{})
+}
+
 func getDsn() string {
 	return fmt.Sprintf("host=%s user=%s dbname=%s port=%s sslmode=%s", host, user, dbName, port, ssl)
 }
@@ -200,7 +237,6 @@ func createDBConnection() error {
 
 	return err
 }
-
 
 func getDatabaseConnection() (*gorm.DB, error) {
 	sqlDB, err := dbConn.DB()
@@ -265,6 +301,7 @@ func main() {
 	router.GET("/todos/:ID", getTodoByID)
 	router.POST("/todos", addTodo)
 	router.PATCH("/todos/:ID", updateTodoStatus)
+	router.DELETE("/todos/:ID", deleteTodo)
 
 	router.Run("localhost:8080")
 }
