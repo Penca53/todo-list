@@ -3,6 +3,7 @@ import { TodoModel } from "../types/Todo";
 interface TodoItemComponentProps {
   todoItem: TodoModel;
   onTodoItemChange: (item: TodoModel) => void;
+  onTodoItemDelete: (item: TodoModel) => void;
 }
 
 const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
@@ -18,7 +19,16 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         />
       </div>
 
-      <h3 className="p-2 break-all">{props.todoItem.description}</h3>
+      <div className="flex p-2 justify-between gap-4">
+        <h3 className="p-2 break-all">{props.todoItem.description}</h3>
+        <button
+          type="button"
+          className="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+          onClick={() => props.onTodoItemDelete(props.todoItem)}
+        >
+          X
+        </button>
+      </div>
     </li>
   );
 };

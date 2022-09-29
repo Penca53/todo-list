@@ -48,6 +48,12 @@ const Home: NextPage = () => {
       });
   };
 
+  const handleTodoItemDelete = (item: TodoModel) => {
+    axios.delete(`http://localhost:8080/todos/${item.id}`).then((res) => {
+      getTodos();
+    });
+  };
+
   const handleAddTodoClick = () => {
     axios
       .post<TodoAPI>("http://localhost:8080/todos", addTodo)
@@ -62,6 +68,7 @@ const Home: NextPage = () => {
             key={todo.id}
             todoItem={todo}
             onTodoItemChange={handleTodoItemChange}
+            onTodoItemDelete={handleTodoItemDelete}
           />
         ))}
       </ul>
