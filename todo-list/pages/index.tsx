@@ -13,10 +13,10 @@ const Home: NextPage = () => {
     axios.get<TodoAPI[]>("http://localhost:8080/todos").then((todosAPI) => {
       const todosModel: TodoModel[] = todosAPI.data.map((todoAPI) => {
         return {
-          id: todoAPI.ID,
-          name: todoAPI.Name,
-          description: todoAPI.Description,
-          status: todoAPI.Status ?? false,
+          id: todoAPI.id,
+          name: todoAPI.name,
+          description: todoAPI.description,
+          status: todoAPI.status,
         } as TodoModel;
       });
 
