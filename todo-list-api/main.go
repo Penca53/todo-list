@@ -49,7 +49,6 @@ func getTodos(c *gin.Context) {
 		print(err)
 	}
 
-	//todos = append(todos, newTodo);
 	var todos []Todo
 	result := db.Find(&todos)
 
@@ -131,7 +130,7 @@ func addTodo(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, todo)
 }
 
-func uptadeTodoStatus(c *gin.Context) {
+func updateTodoStatus(c *gin.Context) {
 	var newStatus UpdateTodoStatusRequest
 
 	if err := (c.BindJSON(&newStatus)); err != nil {
@@ -139,7 +138,7 @@ func uptadeTodoStatus(c *gin.Context) {
     	return
     }
 
-	urlId := c.Param("id")
+	urlId := c.Param("ID")
 	id, _ := strconv.Atoi(urlId)
 
 	db, conErr := getDatabaseConnection()
@@ -263,9 +262,9 @@ func main() {
 
 	router.Use(cors.New(config))
 	router.GET("/todos", getTodos)
-	router.GET("/todos/:id", getTodoByID)
+	router.GET("/todos/:ID", getTodoByID)
 	router.POST("/todos", addTodo)
-	router.PATCH("/todos/:id", uptadeTodoStatus)
+	router.PATCH("/todos/:ID", updateTodoStatus)
 
 	router.Run("localhost:8080")
 }
