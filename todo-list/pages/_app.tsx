@@ -7,7 +7,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     <SessionProvider
       // Provider options are not required but can be useful in situations where
       // you have a short session maxAge time. Shown here with default values.
-
       session={pageProps.session}
     >
       <Component {...pageProps} />
