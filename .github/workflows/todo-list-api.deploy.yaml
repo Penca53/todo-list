@@ -28,7 +28,7 @@ jobs:
           go get .
 
       - name: Run build
-        run: GOOS=linux go build -v -a -o main main.go
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -o main main.go
 
       - name: Create archive
         run: zip todo-list.zip main && ls -la
