@@ -15,10 +15,10 @@ jobs:
         working-directory: ./todo-list-api
     steps:
       - name: Checkout
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
 
       - name: Setup Go
-      - uses: actions/setup-go@v3
+        uses: actions/setup-go@v3
         with:
           go-version-file: "go.mod"
 
