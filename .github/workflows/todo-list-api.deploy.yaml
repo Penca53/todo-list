@@ -8,25 +8,26 @@ on:
       - todo-list-api/**
 
 jobs:
-  Deploy-Preview:
+  deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./todo-list-api
     steps:
+      - name: Checkout
       - uses: actions/checkout@v3
 
       - name: Setup Go
       - uses: actions/setup-go@v3
         with:
-          go-version-file: "path/to/go.mod"
+          go-version-file: "go.mod"
 
       - name: Install dependencies
         run: |
-        go version
-        go get .
-        go get -u golang.org/x/lint/golint
-      
+          go version
+          go get .
+          go get -u golang.org/x/lint/golint
+
       - name: Run build
         run: GOOS=linux go build main
 
