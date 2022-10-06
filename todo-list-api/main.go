@@ -95,7 +95,7 @@ func main() {
 	user.Init(dbConn, router)
 
 	router.Use(cors.New(config))
-	router.Run("localhost:8080")
+	//router.Run("localhost:8080")
 
 	lambda.Start(Handler)
 }
