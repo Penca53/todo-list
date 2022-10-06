@@ -31,7 +31,7 @@ jobs:
         run: GOOS=linux go build -v -a -o main main.go
 
       - name: Create archive
-        run: zip todo-list.zip main
+        run: zip todo-list.zip main && ls -la
 
       - name: Deploy to AWS Lambda
         uses: appleboy/lambda-action@master
@@ -40,4 +40,4 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: ${{ secrets.AWS_REGION }}
           function_name: todo-list-api
-          zip_file: ./todo-list.zip
+          zip_file: todo-list.zip
