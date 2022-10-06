@@ -85,14 +85,10 @@ func main() {
 	
 	fmt.Println("Successfully connected to database!")
 
-	//	Routing with gin
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"*"}
-
 	todo.Init(dbConn, router)
 	user.Init(dbConn, router)
 
-	router.Use(cors.New(config))
+	router.Use(cors.Default())
 	//router.Run("localhost:8080")
 
 	lambda.Start(Handler)

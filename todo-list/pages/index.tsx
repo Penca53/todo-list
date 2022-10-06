@@ -11,18 +11,22 @@ const Home: NextPage = () => {
   const [addTodo, setAddTodo] = useState<TodoModel>({} as TodoModel);
 
   const getTodos = () => {
-    axios.get<TodoAPI[]>("http://localhost:8080/todos").then((todosAPI) => {
-      const todosModel: TodoModel[] = todosAPI.data.map((todoAPI) => {
-        return {
-          id: todoAPI.id,
-          name: todoAPI.name,
-          description: todoAPI.description,
-          status: todoAPI.status,
-        } as TodoModel;
-      });
+    axios
+      .get<TodoAPI[]>(
+        "https://zrxvbfltrk.execute-api.eu-central-1.amazonaws.com/production/todos"
+      )
+      .then((todosAPI) => {
+        const todosModel: TodoModel[] = todosAPI.data.map((todoAPI) => {
+          return {
+            id: todoAPI.id,
+            name: todoAPI.name,
+            description: todoAPI.description,
+            status: todoAPI.status,
+          } as TodoModel;
+        });
 
-      setTodos([...todosModel]);
-    });
+        setTodos([...todosModel]);
+      });
 
     //setTodos(mockTodos);
   };
