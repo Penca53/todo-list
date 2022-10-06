@@ -34,10 +34,10 @@ jobs:
         run: zip todo-list.zip main && ls -la
 
       - name: Deploy to AWS Lambda
-        uses: appleboy/lambda-action@master
+        uses: yvesgurcan/deploy-lambda-function
         with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: ${{ secrets.AWS_REGION }}
-          function_name: todo-list-api
-          zip_file: todo-list.zip
+          AWS_SECRET_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          function-name: todo-list-api
+          package: todo-list.zip
