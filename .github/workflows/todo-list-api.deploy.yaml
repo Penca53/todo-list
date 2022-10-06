@@ -1,0 +1,48 @@
+name: Deploy API
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - todo-list-api/**
+
+jobs:
+  Deploy-Preview:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./todo-list-api
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: "path/to/go.mod"
+
+      - name: Install dependencies
+        run: |
+        go version
+        go get .
+        go get -u golang.org/x/lint/golint
+      
+      - name: Run build
+        run: GOOS=linux go build main
+
+      - name: Run vet & lint
+        run: |
+          go vet .
+          golint .
+
+      - name: Create archive
+        run: zip todo-list.zip main
+
+      - name: Deploy to AWS Lambda
+        uses: appleboy/lambda-action@master
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: ${{ secrets.AWS_REGION }}
+          function_name: todo-list
+          zip_file: todo-list.zip
