@@ -6,8 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetDsn(host string, user string ,dbName string ,port string,ssl string) string {
-	return fmt.Sprintf("host=%s user=%s dbname=%s port=%s sslmode=%s", host, user, dbName, port, ssl)
+func GetDsn(host string, user string, password string, dbName string ,port string) string {
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", host, user, password, dbName, port)
 }
 
 func GetDatabaseConnection(dbConn *gorm.DB) (*gorm.DB, error) {

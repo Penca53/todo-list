@@ -27,7 +27,6 @@ var password string
 var dbName string
 var host string
 var port string
-var ssl string
 var dbConn *gorm.DB
 var ginLambda *ginadapter.GinLambda
 var router *gin.Engine
@@ -36,7 +35,7 @@ func init() {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-	  log.Fatalf("Error loading .env file")
+	  log.Printf("Error loading .env file - Production build found")
 	}
 
 	dbuser = os.Getenv("DB_USER")
@@ -44,7 +43,6 @@ func init() {
 	dbName = os.Getenv("DB_NAME")
 	host = os.Getenv("DB_HOST")
 	port = os.Getenv("DB_PORT")
-	ssl = os.Getenv("DB_SSL")
 
 	// stdout and stderr are sent to AWS CloudWatch Logs
 	log.Printf("Gin cold start")
@@ -60,7 +58,7 @@ func init() {
 
 func createDBConnection() error {
 	db, err := gorm.Open(postgres.New(postgres.Config{
-			DSN: 	utils.GetDsn(host, dbuser, dbName, port, ssl),
+			DSN: 	utils.GetDsn(host, dbuser, password, dbName, port),
 			PreferSimpleProtocol: true,
 		}), &gorm.Config{})
 
