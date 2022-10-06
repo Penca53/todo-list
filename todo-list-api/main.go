@@ -89,7 +89,7 @@ func main() {
 
 	//	Routing with gin
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000"}
+	config.AllowOrigins = []string{"*"}
 
 	todo.Init(dbConn, router)
 	user.Init(dbConn, router)
