@@ -26,15 +26,9 @@ jobs:
         run: |
           go version
           go get .
-          go get -u golang.org/x/lint/golint
 
       - name: Run build
         run: GOOS=linux go build -v -a -o main main.go
-
-      - name: Run vet & lint
-        run: |
-          go vet .
-          golint .
 
       - name: Create archive
         run: zip todo-list.zip main
