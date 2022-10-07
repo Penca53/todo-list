@@ -211,7 +211,7 @@ func deleteTodo(c *gin.Context) {
 		return
 	}
 
-	tx := db.Delete(value)
+	tx := db.Delete(&value)
 	if tx.RowsAffected != 1 {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error occurred while deleting todo",
