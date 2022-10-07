@@ -10,12 +10,12 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/joho/godotenv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	ginadapter "github.com/awslabs/aws-lambda-go-api-proxy/gin"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	"gorm.io/driver/postgres"
@@ -47,6 +47,7 @@ func init() {
 	// stdout and stderr are sent to AWS CloudWatch Logs
 	log.Printf("Gin cold start")
 	router = gin.Default()
+	router.Use(cors.Default())
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
@@ -88,7 +89,7 @@ func main() {
 	todo.Init(dbConn, router)
 	user.Init(dbConn, router)
 
-	router.Use(cors.Default())
+	
 	//router.Run("localhost:8080")
 
 	lambda.Start(Handler)

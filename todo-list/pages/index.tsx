@@ -44,9 +44,12 @@ const Home: NextPage = () => {
 
     // API acknowledge
     axios
-      .patch(`http://localhost:8080/todos/${item.id}`, {
-        status: item.status,
-      })
+      .patch(
+        `https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos/${item.id}`,
+        {
+          status: item.status,
+        }
+      )
       .catch((err) => {
         item.status = prevStatus;
         setTodos([...todos]);
@@ -54,14 +57,21 @@ const Home: NextPage = () => {
   };
 
   const handleTodoItemDelete = (item: TodoModel) => {
-    axios.delete(`http://localhost:8080/todos/${item.id}`).then((res) => {
-      getTodos();
-    });
+    axios
+      .delete(
+        `https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos/${item.id}`
+      )
+      .then((res) => {
+        getTodos();
+      });
   };
 
   const handleAddTodoClick = () => {
     axios
-      .post<TodoAPI>("http://localhost:8080/todos", addTodo)
+      .post<TodoAPI>(
+        "https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos",
+        addTodo
+      )
       .then((res) => getTodos());
   };
 
