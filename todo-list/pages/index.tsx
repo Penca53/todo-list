@@ -18,10 +18,14 @@ const Home: NextPage = () => {
       .then((todosAPI) => {
         const todosModel: TodoModel[] = todosAPI.data.map((todoAPI) => {
           return {
-            id: todoAPI.id,
-            name: todoAPI.name,
-            description: todoAPI.description,
-            status: todoAPI.status,
+            id: todoAPI.ID,
+            createdAt: todoAPI.CreatedAt,
+            updatedAt: todoAPI.UpdatedAt,
+            deletedAt: todoAPI.DeletedAt,
+            name: todoAPI.Name,
+            description: todoAPI.Description,
+            status: todoAPI.Status,
+            userID: todoAPI.UserID,
           } as TodoModel;
         });
 

@@ -17,17 +17,17 @@ var dbConn *gorm.DB
 
 type Todo struct {	
 	gorm.Model
-	Name string `gorm:"notNull" json:"name" binding:"required"`
-	Description string `json:"description"`
-	Status bool `json:"status"`
+	Name string `gorm:"notNull" binding:"required"`
+	Description string
+	Status bool
 	UserID uint
 }
 
 type AddTodoRequest struct {	
-	Name string `json:"name"`
-	Description string `json:"description"`
-	Status bool `json:"status"`
-	UserID uint `json:"userid"`
+	Name string 
+	Description string 
+	Status bool 
+	UserID uint 
 }
 
 type UpdateTodoStatusRequest struct {
