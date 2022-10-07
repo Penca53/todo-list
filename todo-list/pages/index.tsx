@@ -13,7 +13,7 @@ const Home: NextPage = () => {
   const getTodos = () => {
     axios
       .get<TodoAPI[]>(
-        "https://zrxvbfltrk.execute-api.eu-central-1.amazonaws.com/production/todos"
+        "https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos"
       )
       .then((todosAPI) => {
         const todosModel: TodoModel[] = todosAPI.data.map((todoAPI) => {
