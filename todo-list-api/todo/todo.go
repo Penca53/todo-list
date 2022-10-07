@@ -197,7 +197,7 @@ func deleteTodo(c *gin.Context) {
 	}
 
 	var value Todo
-	result := db.First(&value, "id = ?", id)
+	result := db.First(&value, "ID = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
