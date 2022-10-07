@@ -3,10 +3,8 @@ import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import TodoItemComponent from "../components/TodoItemComponent";
-import { mockTodos } from "../mock/Todos";
 import { TodoAPI, TodoModel } from "../types/Todo";
 
-//
 const Home: NextPage = () => {
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const [addTodo, setAddTodo] = useState<TodoModel>({} as TodoModel);
