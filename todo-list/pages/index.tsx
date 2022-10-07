@@ -70,6 +70,7 @@ const Home: NextPage = () => {
   };
 
   const handleAddTodoClick = () => {
+    addTodo.userID = 69;
     axios
       .post<TodoAPI>(
         "https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos",
