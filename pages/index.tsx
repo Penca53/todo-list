@@ -8,6 +8,7 @@ import { TodoAPI, TodoModel } from "../types/Todo";
 const Home: NextPage = () => {
   const [todos, setTodos] = useState<TodoModel[]>([]);
   const [addTodo, setAddTodo] = useState<TodoModel>({} as TodoModel);
+  const [date, setDate] = useState<string>();
 
   const getTodos = () => {
     axios
@@ -30,6 +31,8 @@ const Home: NextPage = () => {
 
         setTodos([...todosModel]);
       });
+
+    axios.get<string>("/api/date").then((res) => setDate(res.data));
 
     //setTodos(mockTodos);
   };
@@ -82,6 +85,7 @@ const Home: NextPage = () => {
   return (
     <Layout>
       <div className="flex flex-col items-center">
+        <p> {date} </p>
         <ul className="mt-8">
           {todos.map((todo) => (
             <TodoItemComponent
