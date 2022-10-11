@@ -15,6 +15,6 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Component {...pageProps} />
     </SessionProvider>
   );
-};
+}
 
 export default trpc.withTRPC(MyApp);
