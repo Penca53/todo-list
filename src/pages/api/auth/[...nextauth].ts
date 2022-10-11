@@ -3,7 +3,8 @@ import Auth0Provider from "next-auth/providers/auth0";
 import GoogleProvider from "next-auth/providers/google";
 import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import prisma from "../../../lib/prismadb";
+import { prisma } from "../../../server/db/client";
+import { env } from "../../../env/server.mjs";
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -18,13 +19,13 @@ export default NextAuth({
     }),
     */
     Auth0Provider({
-      clientId: process.env.AUTH0_ID,
-      clientSecret: process.env.AUTH0_SECRET,
-      issuer: process.env.AUTH0_ISSUER,
+      clientId: env.AUTH0_ID,
+      clientSecret: env.AUTH0_SECRET,
+      issuer: env.AUTH0_ISSUER,
     }),
     GoogleProvider({
-      clientId: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
+      clientId: env.GOOGLE_ID,
+      clientSecret: env.GOOGLE_SECRET,
     }),
   ],
   session: {

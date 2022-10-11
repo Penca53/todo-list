@@ -1,9 +1,9 @@
-import axios from "axios";
+import { trpc } from "../utils/trpc";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
-import Layout from "../components/Layout";
-import TodoItemComponent from "../components/TodoItemComponent";
-import { TodoAPI, TodoModel } from "../types/Todo";
+import Layout from "../../components/Layout";
+import TodoItemComponent from "../../components/TodoItemComponent";
+import { TodoAPI, TodoModel } from "../../types/Todo";
 
 const Home: NextPage = () => {
   const [todos, setTodos] = useState<TodoModel[]>([]);
@@ -11,6 +11,8 @@ const Home: NextPage = () => {
   const [date, setDate] = useState<string>();
 
   const getTodos = () => {
+
+    /*
     axios
       .get<TodoAPI[]>(
         "https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos"
@@ -33,6 +35,8 @@ const Home: NextPage = () => {
       });
 
     axios.get<string>("/api/ping").then((res) => setDate(res.data));
+    console.log("Ping")
+    */
 
     //setTodos(mockTodos);
   };
@@ -48,6 +52,7 @@ const Home: NextPage = () => {
     item.status = !item.status;
     setTodos([...todos]);
 
+    /*
     // API acknowledge
     axios
       .patch(
@@ -60,9 +65,11 @@ const Home: NextPage = () => {
         item.status = prevStatus;
         setTodos([...todos]);
       });
+    */
   };
 
   const handleTodoItemDelete = (item: TodoModel) => {
+    /*
     axios
       .delete(
         `https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos/${item.id}`
@@ -70,16 +77,20 @@ const Home: NextPage = () => {
       .then((res) => {
         getTodos();
       });
+      */
   };
 
   const handleAddTodoClick = () => {
     addTodo.userID = 69;
+
+    /*
     axios
       .post<TodoAPI>(
         "https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos",
         addTodo
       )
       .then((res) => getTodos());
+      */
   };
 
   return (

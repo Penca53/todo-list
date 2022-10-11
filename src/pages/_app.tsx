@@ -1,5 +1,7 @@
+// src/pages/_app.tsx
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
+import { trpc } from "../utils/trpc";
 import { SessionProvider } from "next-auth/react";
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -13,6 +15,6 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Component {...pageProps} />
     </SessionProvider>
   );
-}
+};
 
-export default MyApp;
+export default trpc.withTRPC(MyApp);
