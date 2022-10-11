@@ -32,7 +32,7 @@ const Home: NextPage = () => {
         setTodos([...todosModel]);
       });
 
-    axios.get<string>("/api/date").then((res) => setDate(res.data));
+    axios.get<string>("/api/ping").then((res) => setDate(res.data));
 
     //setTodos(mockTodos);
   };
@@ -85,7 +85,7 @@ const Home: NextPage = () => {
   return (
     <Layout>
       <div className="flex flex-col items-center">
-        <p> {date} </p>
+        <p> {JSON.stringify(date)} </p>
         <ul className="mt-8">
           {todos.map((todo) => (
             <TodoItemComponent
