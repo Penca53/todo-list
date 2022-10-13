@@ -10,7 +10,10 @@ export const todoRouter = router({
       };
     }),
   getTodos: protectedProcedure.query(({ ctx }) => {
-    return ctx.prisma.todo.findMany({ where: { userId: ctx.session.user.id } });
+    return ctx.prisma.todo.findMany({
+      where: { userId: ctx.session.user.id },
+      orderBy: { id: "asc" },
+    });
   }),
   createTodo: protectedProcedure
     .input(
