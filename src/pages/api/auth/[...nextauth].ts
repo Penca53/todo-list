@@ -43,6 +43,15 @@ export default NextAuth({
     // updateAge: 24 * 60 * 60, // 24 hours
   },
 
+  callbacks: {
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.user.id = token.sub;
+      }
+      return session;
+    },
+  },
+
   // Enable debug messages in the console if you are having problems
   debug: false,
 });

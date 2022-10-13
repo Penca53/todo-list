@@ -1,9 +1,9 @@
-import { TodoModel } from "../types/Todo";
+import { Todo } from "@prisma/client";
 
 interface TodoItemComponentProps {
-  todoItem: TodoModel;
-  onTodoItemChange: (item: TodoModel) => void;
-  onTodoItemDelete: (item: TodoModel) => void;
+  todoItem: Todo;
+  onTodoItemChange: (item: Todo) => void;
+  onTodoItemDelete: (item: Todo) => void;
 }
 
 const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
@@ -11,7 +11,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
     <li className="mt-2 bg-white shadow-md rounded border border-gray-500 w-80">
       <div className="flex p-2 justify-between gap-4 border-b border-gray-300">
         <h2 className="break-all">{props.todoItem.name}</h2>
-        <input
+        <input 
           type={"checkbox"}
           // TODO: allow more than boolean values
           checked={props.todoItem.status}

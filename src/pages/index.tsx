@@ -1,56 +1,23 @@
 import { trpc } from "../utils/trpc";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
-import Layout from "../../components/Layout";
-import TodoItemComponent from "../../components/TodoItemComponent";
-import { TodoAPI, TodoModel } from "../../types/Todo";
+import Layout from "../components/Layout";
+import TodoItemComponent from "../components/TodoItemComponent";
+import { Todo } from "@prisma/client";
 
 const Home: NextPage = () => {
-  const [todos, setTodos] = useState<TodoModel[]>([]);
-  const [addTodo, setAddTodo] = useState<TodoModel>({} as TodoModel);
-  const [date, setDate] = useState<string>();
+  //const [todos, setTodos] = useState<TodoModel[]>([]);
+  const [addTodo, setAddTodo] = useState<Todo>({} as Todo);
+  const query = trpc.todo.getTodos.useQuery();
+  const mutation = trpc.todo.createTodo.useMutation();
+  const deleteTodo = trpc.todo.deleteTodo.useMutation();
 
-  const getTodos = () => {
-
-    /*
-    axios
-      .get<TodoAPI[]>(
-        "https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos"
-      )
-      .then((todosAPI) => {
-        const todosModel: TodoModel[] = todosAPI.data.map((todoAPI) => {
-          return {
-            id: todoAPI.ID,
-            createdAt: todoAPI.CreatedAt,
-            updatedAt: todoAPI.UpdatedAt,
-            deletedAt: todoAPI.DeletedAt,
-            name: todoAPI.Name,
-            description: todoAPI.Description,
-            status: todoAPI.Status,
-            userID: todoAPI.UserID,
-          } as TodoModel;
-        });
-
-        setTodos([...todosModel]);
-      });
-
-    axios.get<string>("/api/ping").then((res) => setDate(res.data));
-    console.log("Ping")
-    */
-
-    //setTodos(mockTodos);
-  };
-
-  useEffect(() => {
-    getTodos();
-  }, []);
-
-  const handleTodoItemChange = (item: TodoModel) => {
+  const handleTodoItemChange = (item: Todo) => {
     const prevStatus = item.status;
 
     // Prediction
     item.status = !item.status;
-    setTodos([...todos]);
+    //setTodos([...todos]);
 
     /*
     // API acknowledge
@@ -68,7 +35,7 @@ const Home: NextPage = () => {
     */
   };
 
-  const handleTodoItemDelete = (item: TodoModel) => {
+  const handleTodoItemDelete = (item: Todo) => {
     /*
     axios
       .delete(
@@ -78,11 +45,15 @@ const Home: NextPage = () => {
         getTodos();
       });
       */
+
+    deleteTodo
+      .mutateAsync({
+        id: item.id,
+      })
+      .then(() => query.refetch());
   };
 
   const handleAddTodoClick = () => {
-    addTodo.userID = 69;
-
     /*
     axios
       .post<TodoAPI>(
@@ -91,34 +62,47 @@ const Home: NextPage = () => {
       )
       .then((res) => getTodos());
       */
+
+    mutation
+      .mutateAsync({
+        name: addTodo.name,
+        description: addTodo.description,
+        status: addTodo.status,
+      })
+      .then(() => query.refetch());
   };
 
   return (
     <Layout>
       <div className="flex flex-col items-center">
-        <p> {JSON.stringify(date)} </p>
         <ul className="mt-8">
-          {todos.map((todo) => (
-            <TodoItemComponent
-              key={todo.id}
-              todoItem={todo}
-              onTodoItemChange={handleTodoItemChange}
-              onTodoItemDelete={handleTodoItemDelete}
-            />
-          ))}
+          {query.isLoading
+            ? "Loading..."
+            : query.isError
+            ? "Error!"
+            : query.data
+            ? query.data.map((todo) => (
+                <TodoItemComponent
+                  key={todo.id}
+                  todoItem={todo}
+                  onTodoItemChange={handleTodoItemChange}
+                  onTodoItemDelete={handleTodoItemDelete}
+                />
+              ))
+            : null}
         </ul>
 
         <div className="mt-8">
-          <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <form className="mb-4 rounded bg-white px-8 pt-6 pb-8 shadow-md">
             <div className="mb-4">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="mb-2 block text-sm font-bold text-gray-700"
                 htmlFor="name"
               >
                 Name
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
                 id="name"
                 type="text"
                 placeholder="Name..."
@@ -133,13 +117,13 @@ const Home: NextPage = () => {
             </div>
             <div className="mb-4">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="mb-2 block text-sm font-bold text-gray-700"
                 htmlFor="description"
               >
                 Description
               </label>
               <textarea
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="focus:shadow-outline w-full appearance-none rounded border py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
                 id="description"
                 placeholder="Description..."
                 value={addTodo.description}
@@ -153,13 +137,13 @@ const Home: NextPage = () => {
             </div>
             <div className="mb-6">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="mb-2 block text-sm font-bold text-gray-700"
                 htmlFor="status"
               >
                 Status
               </label>
               <input
-                className="shadow w-6 h-6 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className="h-6 w-6 rounded border-gray-300 bg-gray-100 text-blue-600 shadow focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
                 id="status"
                 type="checkbox"
                 checked={addTodo.status}
@@ -173,7 +157,7 @@ const Home: NextPage = () => {
             </div>
             <div className="flex justify-center">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="focus:shadow-outline rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700 focus:outline-none"
                 type="button"
                 onClick={handleAddTodoClick}
               >
