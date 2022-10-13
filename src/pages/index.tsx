@@ -11,10 +11,9 @@ const Home: NextPage = () => {
   const query = trpc.todo.getTodos.useQuery();
   const mutation = trpc.todo.createTodo.useMutation();
   const deleteTodo = trpc.todo.deleteTodo.useMutation();
+  const updateTodoStatus = trpc.todo.updateTodoStatus.useMutation();
 
   const handleTodoItemChange = (item: Todo) => {
-    const prevStatus = item.status;
-
     // Prediction
     item.status = !item.status;
     //setTodos([...todos]);
@@ -33,6 +32,13 @@ const Home: NextPage = () => {
         setTodos([...todos]);
       });
     */
+
+    updateTodoStatus
+      .mutateAsync({
+        id: item.id,
+        status: item.status,
+      })
+      .then(() => query.refetch());
   };
 
   const handleTodoItemDelete = (item: Todo) => {

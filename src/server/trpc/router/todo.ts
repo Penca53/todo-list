@@ -43,4 +43,22 @@ export const todoRouter = router({
         },
       });
     }),
+
+  updateTodoStatus: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().int(),
+        status: z.boolean(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.todo.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          status: input.status,
+        },
+      });
+    }),
 });
