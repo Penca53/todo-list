@@ -43,7 +43,6 @@ export const todoRouter = router({
         },
       });
     }),
-
   updateTodoStatus: protectedProcedure
     .input(
       z.object({
