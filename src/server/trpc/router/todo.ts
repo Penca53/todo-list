@@ -29,6 +29,7 @@ export const todoRouter = router({
           name: input.name,
           description: input.description,
           status: input.status || false,
+          isFavourite: false,
           userId: ctx.session.user.id,
         },
       });
@@ -60,6 +61,24 @@ export const todoRouter = router({
         },
         data: {
           status: input.status,
+        },
+      });
+    }),
+
+  updateTodoFavourite: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().int(),
+        isFavourite: z.boolean(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.todo.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          isFavourite: input.isFavourite,
         },
       });
     }),

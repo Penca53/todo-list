@@ -12,6 +12,7 @@ const Home: NextPage = () => {
   const mutation = trpc.todo.createTodo.useMutation();
   const deleteTodo = trpc.todo.deleteTodo.useMutation();
   const updateTodoStatus = trpc.todo.updateTodoStatus.useMutation();
+  const updateTodoFavourite = trpc.todo.updateTodoFavourite.useMutation();
 
   const handleTodoItemChange = (item: Todo) => {
     // Prediction
@@ -32,7 +33,6 @@ const Home: NextPage = () => {
         setTodos([...todos]);
       });
     */
-
     updateTodoStatus
       .mutateAsync({
         id: item.id,

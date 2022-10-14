@@ -60,6 +60,7 @@ model Todo {
     name        String
     description String
     status      Boolean
+    isFavourite Boolean
     userId      String
     user        User     @relation(fields: [userId], references: [id])
 }
