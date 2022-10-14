@@ -14,25 +14,22 @@ const Home: NextPage = () => {
   const updateTodoStatus = trpc.todo.updateTodoStatus.useMutation();
   const updateTodoFavourite = trpc.todo.updateTodoFavourite.useMutation();
 
-  const handleTodoItemChange = (item: Todo) => {
+  const handleTodoItemChangeIsFavourite = (item: Todo) => {
+    // Prediction
+    item.isFavourite = !item.isFavourite;
+
+    updateTodoFavourite
+      .mutateAsync({
+        id: item.id,
+        isFavourite: item.isFavourite,
+      })
+      .then(() => query.refetch());
+  };
+
+  const handleTodoItemChangeStatus = (item: Todo) => {
     // Prediction
     item.status = !item.status;
-    //setTodos([...todos]);
 
-    /*
-    // API acknowledge
-    axios
-      .patch(
-        `https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos/${item.id}`,
-        {
-          status: item.status,
-        }
-      )
-      .catch((err) => {
-        item.status = prevStatus;
-        setTodos([...todos]);
-      });
-    */
     updateTodoStatus
       .mutateAsync({
         id: item.id,
@@ -42,16 +39,6 @@ const Home: NextPage = () => {
   };
 
   const handleTodoItemDelete = (item: Todo) => {
-    /*
-    axios
-      .delete(
-        `https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos/${item.id}`
-      )
-      .then((res) => {
-        getTodos();
-      });
-      */
-
     deleteTodo
       .mutateAsync({
         id: item.id,
@@ -60,15 +47,6 @@ const Home: NextPage = () => {
   };
 
   const handleAddTodoClick = () => {
-    /*
-    axios
-      .post<TodoAPI>(
-        "https://s23ety93ib.execute-api.eu-central-1.amazonaws.com/prod/todos",
-        addTodo
-      )
-      .then((res) => getTodos());
-      */
-
     mutation
       .mutateAsync({
         name: addTodo.name,
@@ -91,7 +69,8 @@ const Home: NextPage = () => {
                 <TodoItemComponent
                   key={todo.id}
                   todoItem={todo}
-                  onTodoItemChange={handleTodoItemChange}
+                  onTodoItemChangeIsFavourite={handleTodoItemChangeIsFavourite}
+                  onTodoItemChangeStatus={handleTodoItemChangeStatus}
                   onTodoItemDelete={handleTodoItemDelete}
                 />
               ))
