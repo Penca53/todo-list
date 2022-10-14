@@ -43,6 +43,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     todos         Todo[]
+    todoGroup     TodoGroup[]
 }
 
 model VerificationToken {
@@ -54,13 +55,35 @@ model VerificationToken {
 }
 
 model Todo {
-    id          Int      @id @default(autoincrement())
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
     name        String
     description String
     status      Boolean
     isFavourite Boolean
     userId      String
+    user        User      @relation(fields: [userId], references: [id])
+    todoGroupId Int      
+    todoGroup   TodoGroup @relation(fields: [todoGroupId], references: [id])
+}
+
+model Label {
+    id               Int      @id @default(autoincrement())
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+    name             String
+    todoGroupId      Int
+    todoGroup        TodoGroup     @relation(fields: [todoGroupId], references: [id])
+}
+
+model TodoGroup {
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    name        String
+    userId      String
     user        User     @relation(fields: [userId], references: [id])
+    todos       Todo[]
+    label       Label[]
 }
