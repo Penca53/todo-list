@@ -2,13 +2,6 @@ import { router, publicProcedure, protectedProcedure } from "../trpc";
 import { z } from "zod";
 
 export const todoRouter = router({
-  hello: publicProcedure
-    .input(z.object({ text: z.string().nullish() }).nullish())
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input?.text ?? "world"}`,
-      };
-    }),
   getTodos: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.todo.findMany({
       where: { userId: ctx.session.user.id },
@@ -20,7 +13,8 @@ export const todoRouter = router({
       z.object({
         name: z.string(),
         description: z.string(),
-        status: z.boolean().nullish(),
+        status: z.boolean().default(false),
+        todoGroupId: z.number().int().nullish(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -28,9 +22,10 @@ export const todoRouter = router({
         data: {
           name: input.name,
           description: input.description,
-          status: input.status || false,
+          status: input.status,
           isFavourite: false,
           userId: ctx.session.user.id,
+          todoGroupId: input.todoGroupId,
         },
       });
     }),

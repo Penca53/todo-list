@@ -8,11 +8,14 @@ import { Todo } from "@prisma/client";
 const Home: NextPage = () => {
   //const [todos, setTodos] = useState<TodoModel[]>([]);
   const [addTodo, setAddTodo] = useState<Todo>({} as Todo);
-  const query = trpc.todo.getTodos.useQuery();
-  const mutation = trpc.todo.createTodo.useMutation();
+  const getTodos = trpc.todo.getTodos.useQuery();
+  const createTodo = trpc.todo.createTodo.useMutation();
   const deleteTodo = trpc.todo.deleteTodo.useMutation();
   const updateTodoStatus = trpc.todo.updateTodoStatus.useMutation();
   const updateTodoFavourite = trpc.todo.updateTodoFavourite.useMutation();
+
+  const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
+  const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
 
   const handleTodoItemChangeIsFavourite = (item: Todo) => {
     // Prediction
@@ -23,7 +26,7 @@ const Home: NextPage = () => {
         id: item.id,
         isFavourite: item.isFavourite,
       })
-      .then(() => query.refetch());
+      .then(() => getTodos.refetch());
   };
 
   const handleTodoItemChangeStatus = (item: Todo) => {
@@ -35,7 +38,7 @@ const Home: NextPage = () => {
         id: item.id,
         status: item.status,
       })
-      .then(() => query.refetch());
+      .then(() => getTodos.refetch());
   };
 
   const handleTodoItemDelete = (item: Todo) => {
@@ -43,29 +46,36 @@ const Home: NextPage = () => {
       .mutateAsync({
         id: item.id,
       })
-      .then(() => query.refetch());
+      .then(() => getTodos.refetch());
   };
 
   const handleAddTodoClick = () => {
-    mutation
+    createTodo
       .mutateAsync({
         name: addTodo.name,
         description: addTodo.description,
         status: addTodo.status,
       })
-      .then(() => query.refetch());
+      .then(() => getTodos.refetch());
+
+    createTodoGroup
+      .mutateAsync({
+        name: addTodo.name + " group",
+        parentGroupId: 1,
+      })
+      .then(() => getTodoGroups.refetch());
   };
 
   return (
     <Layout>
       <div className="flex flex-col items-center">
         <ul className="mt-8">
-          {query.isLoading
+          {getTodos.isLoading
             ? "Loading..."
-            : query.isError
+            : getTodos.isError
             ? "Error!"
-            : query.data
-            ? query.data.map((todo) => (
+            : getTodos.data
+            ? getTodos.data.map((todo) => (
                 <TodoItemComponent
                   key={todo.id}
                   todoItem={todo}
