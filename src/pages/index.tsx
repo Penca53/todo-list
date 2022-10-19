@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import TodoItemComponent from "../components/TodoItemComponent";
 import { Todo, TodoGroup } from "@prisma/client";
+import { GroupTreeNode } from "../../types/Todo";
+import GroupNode from "../components/GroupNode";
 
 const Home: NextPage = () => {
   //const [todos, setTodos] = useState<TodoModel[]>([]);
   const [addTodo, setAddTodo] = useState<Todo>({} as Todo);
+  const [selectedTodoGroup, setSelectedTodoGroup] = useState<TodoGroup>();
   const getTodos = trpc.todo.getTodos.useQuery();
   const createTodo = trpc.todo.createTodo.useMutation();
   const deleteTodo = trpc.todo.deleteTodo.useMutation();
@@ -59,13 +62,11 @@ const Home: NextPage = () => {
       .then(() => getTodos.refetch());
   };
 
-  interface GroupTreeNode {
-    item: TodoGroup | null;
-    parent: GroupTreeNode | null;
-    children: GroupTreeNode[];
-  }
+  const handleTodoGroupNodeClick = (group: TodoGroup) => {
+    setSelectedTodoGroup(group);
+  };
 
-  const createGroupTree = (todoGroups: TodoGroup[]): string => {
+  const createGroupTree = (todoGroups: TodoGroup[]): GroupTreeNode => {
     const root: GroupTreeNode = { item: null, parent: null, children: [] };
 
     const nodesMap = new Map<number, GroupTreeNode>();
@@ -95,13 +96,14 @@ const Home: NextPage = () => {
       nodesMap.set(group.id, node);
     }
 
-    return "";
+    return root;
   };
 
   return (
     <Layout>
-      <div className="flex flex-col items-center">
-        <ul className="mt-8">
+      <div className="flex h-full">
+        {/*
+          <ul className="mt-8">
           {getTodos.isLoading
             ? "Loading..."
             : getTodos.isError
@@ -118,15 +120,65 @@ const Home: NextPage = () => {
               ))
             : null}
         </ul>
+          */}
 
-        <ul className="mt-4">
-          {getTodoGroups.isLoading
-            ? "Loading..."
-            : getTodoGroups.isError
-            ? "Error!"
-            : getTodoGroups.data
-            ? createGroupTree(getTodoGroups.data)
-            : null}
+        <div className="w-96 overflow-y-scroll  p-4">
+          <ul className="mt-4">
+            {getTodoGroups.isLoading ? (
+              "Loading..."
+            ) : getTodoGroups.isError ? (
+              "Error!"
+            ) : getTodoGroups.data ? (
+              <GroupNode
+                todos={getTodos.data!}
+                groupNode={createGroupTree(getTodoGroups.data)}
+                height={0}
+                onGroupClick={handleTodoGroupNodeClick}
+              />
+            ) : null}
+          </ul>
+        </div>
+        <div className="flex-1 overflow-y-scroll  p-4">
+          <ul className="mt-4">
+            {getTodos.isLoading
+              ? "Loading..."
+              : getTodos.isError
+              ? "Error!"
+              : getTodos.data
+              ? getTodos.data.map((todo) => {
+                  if (todo.todoGroupId === selectedTodoGroup?.id) {
+                    return (
+                      <TodoItemComponent
+                        todoItem={todo}
+                        key={todo.id}
+                        onTodoItemChangeStatus={handleTodoItemChangeStatus}
+                        onTodoItemChangeIsFavourite={
+                          handleTodoItemChangeIsFavourite
+                        }
+                        onTodoItemDelete={handleTodoItemDelete}
+                      />
+                    );
+                  } else {
+                    return null;
+                  }
+                })
+              : null}
+          </ul>
+        </div>
+
+        {/*
+            <ul className="mt-4">
+          {getTodoGroups.isLoading ? (
+            "Loading..."
+          ) : getTodoGroups.isError ? (
+            "Error!"
+          ) : getTodoGroups.data ? (
+            <GroupNode
+              todos={getTodos.data!}
+              groupNode={createGroupTree(getTodoGroups.data)}
+              height={0}
+            />
+          ) : null}
         </ul>
 
         <div className="mt-8">
@@ -203,6 +255,7 @@ const Home: NextPage = () => {
             </div>
           </form>
         </div>
+            */}
       </div>
     </Layout>
   );

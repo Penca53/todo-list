@@ -7,10 +7,9 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <>
+    <div className="flex h-full flex-col">
       <Header />
-      <main>{children}</main>
-      <Footer />
-    </>
+      <main className="overflow-hidden">{children}</main>
+    </div>
   );
 }
