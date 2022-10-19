@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import TodoItemComponent from "../components/TodoItemComponent";
-import { Todo } from "@prisma/client";
+import { Todo, TodoGroup } from "@prisma/client";
 
 const Home: NextPage = () => {
   //const [todos, setTodos] = useState<TodoModel[]>([]);
@@ -57,13 +57,45 @@ const Home: NextPage = () => {
         status: addTodo.status,
       })
       .then(() => getTodos.refetch());
+  };
 
-    createTodoGroup
-      .mutateAsync({
-        name: addTodo.name + " group",
-        parentGroupId: 1,
-      })
-      .then(() => getTodoGroups.refetch());
+  interface GroupTreeNode {
+    item: TodoGroup | null;
+    parent: GroupTreeNode | null;
+    children: GroupTreeNode[];
+  }
+
+  const createGroupTree = (todoGroups: TodoGroup[]): string => {
+    const root: GroupTreeNode = { item: null, parent: null, children: [] };
+
+    const nodesMap = new Map<number, GroupTreeNode>();
+
+    for (const group of todoGroups) {
+      let parent = null;
+      if (group.parentGroupId === null) {
+        parent = root;
+      } else {
+        parent = nodesMap.get(group.parentGroupId);
+        if (!parent) {
+          parent = { item: null, parent: null, children: [] };
+          nodesMap.set(group.parentGroupId, parent);
+        }
+      }
+
+      let node = nodesMap.get(group.id);
+      if (!node) {
+        node = {
+          item: group,
+          parent: parent,
+          children: [],
+        };
+      }
+
+      parent.children.push(node);
+      nodesMap.set(group.id, node);
+    }
+
+    return "";
   };
 
   return (
@@ -84,6 +116,16 @@ const Home: NextPage = () => {
                   onTodoItemDelete={handleTodoItemDelete}
                 />
               ))
+            : null}
+        </ul>
+
+        <ul className="mt-4">
+          {getTodoGroups.isLoading
+            ? "Loading..."
+            : getTodoGroups.isError
+            ? "Error!"
+            : getTodoGroups.data
+            ? createGroupTree(getTodoGroups.data)
             : null}
         </ul>
 
