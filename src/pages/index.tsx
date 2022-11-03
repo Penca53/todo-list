@@ -10,14 +10,17 @@ import GroupNode from "../components/GroupNode";
 const Home: NextPage = () => {
   //const [todos, setTodos] = useState<TodoModel[]>([]);
   const [addTodo, setAddTodo] = useState<Todo>({} as Todo);
-  const [selectedTodoGroup, setSelectedTodoGroup] = useState<TodoGroup>();
+  const [selectedTodoGroup, setSelectedTodoGroup] = useState<TodoGroup | null>(
+    null
+  );
   const getTodos = trpc.todo.getTodos.useQuery();
+  const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
+
   const createTodo = trpc.todo.createTodo.useMutation();
   const deleteTodo = trpc.todo.deleteTodo.useMutation();
   const updateTodoStatus = trpc.todo.updateTodoStatus.useMutation();
   const updateTodoFavourite = trpc.todo.updateTodoFavourite.useMutation();
 
-  const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
 
   const handleTodoItemChangeIsFavourite = (item: Todo) => {
@@ -32,16 +35,14 @@ const Home: NextPage = () => {
       .then(() => getTodos.refetch());
   };
 
-  const handleTodoItemChangeStatus = (item: Todo) => {
+  const handleTodoItemChangeStatus = (item: Todo, newStatus: boolean) => {
     // Prediction
-    item.status = !item.status;
+    item.status = newStatus;
 
-    updateTodoStatus
-      .mutateAsync({
-        id: item.id,
-        status: item.status,
-      })
-      .then(() => getTodos.refetch());
+    updateTodoStatus.mutateAsync({
+      id: item.id,
+      status: item.status,
+    });
   };
 
   const handleTodoItemDelete = (item: Todo) => {
@@ -62,7 +63,7 @@ const Home: NextPage = () => {
       .then(() => getTodos.refetch());
   };
 
-  const handleTodoGroupNodeClick = (group: TodoGroup) => {
+  const handleTodoGroupNodeClick = (group: TodoGroup | null) => {
     setSelectedTodoGroup(group);
   };
 
@@ -122,7 +123,7 @@ const Home: NextPage = () => {
         </ul>
           */}
 
-        <div className="w-96 overflow-y-scroll  p-4">
+        <div className="w-96 overflow-y-scroll border-r border-gray-500 p-4 shadow shadow-gray-400">
           <ul className="mt-4">
             {getTodoGroups.isLoading ? (
               "Loading..."
@@ -146,7 +147,10 @@ const Home: NextPage = () => {
               ? "Error!"
               : getTodos.data
               ? getTodos.data.map((todo) => {
-                  if (todo.todoGroupId === selectedTodoGroup?.id) {
+                  if (
+                    (!todo.todoGroupId && !selectedTodoGroup) ||
+                    todo.todoGroupId === selectedTodoGroup?.id
+                  ) {
                     return (
                       <TodoItemComponent
                         todoItem={todo}
@@ -164,6 +168,112 @@ const Home: NextPage = () => {
                 })
               : null}
           </ul>
+
+          <label htmlFor="create-new-todo-modal" className="modal-button btn">
+            Create new Todo
+          </label>
+
+          <input
+            type="checkbox"
+            id="create-new-todo-modal"
+            className="modal-toggle"
+          />
+          <div className="modal">
+            <div className="modal-box relative">
+              <label
+                htmlFor="create-new-todo-modal"
+                className="btn btn-circle btn-sm absolute right-2 top-2"
+              >
+                ✕
+              </label>
+              <div>
+                <form className="mb-4 rounded px-8 pt-6 pb-8 shadow-md">
+                  <div className="mb-4">
+                    <label
+                      className="mb-2 block text-sm font-bold"
+                      htmlFor="name"
+                    >
+                      Name
+                    </label>
+                    <input
+                      className="input input-bordered w-full max-w-xs"
+                      id="name"
+                      type="text"
+                      placeholder="Name..."
+                      value={addTodo.name}
+                      onChange={(e) => {
+                        setAddTodo((prevState) => ({
+                          ...prevState,
+                          name: e.target.value,
+                        }));
+                      }}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      className="mb-2 block text-sm font-bold"
+                      htmlFor="description"
+                    >
+                      Description
+                    </label>
+                    <textarea
+                      className="textarea textarea-bordered w-full max-w-xs"
+                      id="description"
+                      placeholder="Description..."
+                      value={addTodo.description}
+                      onChange={(e) => {
+                        setAddTodo((prevState) => ({
+                          ...prevState,
+                          description: e.target.value,
+                        }));
+                      }}
+                    />
+                  </div>
+                  <div className="mb-6">
+                    <label
+                      className="mb-2 block text-sm font-bold"
+                      htmlFor="status"
+                    >
+                      Status
+                    </label>
+                    <input
+                      className="checkbox checkbox-lg"
+                      id="status"
+                      type="checkbox"
+                      checked={addTodo.status}
+                      onChange={() => {
+                        setAddTodo((prevState) => ({
+                          ...prevState,
+                          status: !prevState.status,
+                        }));
+                      }}
+                    />
+                  </div>
+                  <div className="flex justify-center">
+                    <button
+                      className="btn rounded"
+                      type="button"
+                      onClick={handleAddTodoClick}
+                    >
+                      Add Todo
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal">
+          <div className="modal-box relative">
+            <label
+              htmlFor="edit-todo-modal"
+              className="btn btn-circle btn-sm absolute right-2 top-2"
+            >
+              ✕
+            </label>
+            <div>Hello</div>
+          </div>
         </div>
 
         {/*
