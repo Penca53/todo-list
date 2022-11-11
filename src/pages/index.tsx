@@ -169,7 +169,7 @@ const Home: NextPage = () => {
               : null}
           </ul>
 
-          <label htmlFor="create-new-todo-modal" className="modal-button btn">
+          <label htmlFor="create-new-todo-modal" className="mt-6 modal-button btn">
             Create new Todo
           </label>
 
