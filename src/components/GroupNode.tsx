@@ -30,13 +30,16 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
   };
 
   return (
-    <div className="ml-6 flex-row bg-gray-500">
-      <button
-        onClick={() => props.onGroupClick(props.groupNode.item)}
-        className="btn btn-ghost justify-start"
-      >
-        {props.groupNode.item ? props.groupNode.item.name : session?.user.name}
-      </button>
+    <div className="ml-6">
+      <div className="flex justify-between  ">
+        <button
+          onClick={() => props.onGroupClick(props.groupNode.item)}
+          className="btn btn-ghost"
+        >
+          {props.groupNode.item
+            ? props.groupNode.item.name
+            : session?.user.name}
+        </button>
 
       <label
         htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
@@ -50,13 +53,21 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
           stroke="currentColor"
           className="h-6 w-6"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </label>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="h-6 w-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </label>
 
       <input
         type="checkbox"
@@ -73,12 +84,15 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
             ✕
           </label>
 
-          <div>
-            <form className="mb-4 rounded px-8 pt-3">
-              <div className="mb-4">
-                <label className="mb-2 block text-sm font-bold" htmlFor="name">
-                  New Group Name
-                </label>
+            <div>
+              <form className="mb-4 rounded px-8 pt-3">
+                <div className="mb-4">
+                  <label
+                    className="mb-2 block text-sm font-bold"
+                    htmlFor="name"
+                  >
+                    New Group Name
+                  </label>
 
                 <input
                   className="input input-bordered w-full max-w-xs"
@@ -98,8 +112,8 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                     Add Group
                   </button>
                 </div>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </div>
