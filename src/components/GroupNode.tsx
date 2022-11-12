@@ -5,7 +5,6 @@ import { GroupTreeNode } from "../../types/Todo";
 import { useState } from "react";
 
 interface GroupNodeProps {
-  todos: Todo[];
   groupNode: GroupTreeNode;
   height: number;
   onGroupClick: (group: TodoGroup | null) => void;
@@ -19,6 +18,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
 
   const handleAddGroupClick = () => {
+    console.log(props.groupNode.item);
     createTodoGroup
       .mutateAsync({
         name: addGroup.name,
@@ -111,7 +111,6 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
         {props.groupNode.children.map((child) => (
           <GroupNode
             key={child.item?.id}
-            todos={props.todos}
             groupNode={child}
             height={props.height + 1}
             onGroupClick={props.onGroupClick}

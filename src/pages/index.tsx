@@ -129,7 +129,6 @@ const Home: NextPage = () => {
               "Error!"
             ) : getTodoGroups.data ? (
               <GroupNode
-                todos={getTodos.data!}
                 groupNode={createGroupTree(getTodoGroups.data)}
                 height={0}
                 onGroupClick={handleTodoGroupNodeClick}
