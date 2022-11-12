@@ -17,14 +17,14 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
 
-  const handleAddGroupClick = (node: GroupTreeNode) => {
+  const handleAddGroupClick = () => {
     if (!addGroupName || addGroupName.length <= 0) {
       return;
     }
     createTodoGroup
       .mutateAsync({
         name: addGroupName,
-        parentGroupId: node.item?.id,
+        parentGroupId: props.groupNode.item?.id,
       })
       .then(() => getTodoGroups.refetch());
   };
@@ -39,7 +39,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
       </button>
 
       <label
-        htmlFor="create-new-group-modal"
+        htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
         className="modal-button btn btn-ghost justify-end"
       >
         <svg
@@ -60,14 +60,14 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
 
       <input
         type="checkbox"
-        id="create-new-group-modal"
+        id={"create-new-group-modal" + props.groupNode.item?.id}
         className="modal-toggle"
       />
 
       <div className="modal">
         <div className="modal-box relative">
           <label
-            htmlFor="create-new-group-modal"
+            htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
             className="btn btn-circle btn-sm absolute right-2 top-2"
           >
             ✕
@@ -93,7 +93,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                   <button
                     className="btn rounded"
                     type="button"
-                    onClick={() => handleAddGroupClick(props.groupNode)}
+                    onClick={handleAddGroupClick}
                   >
                     Add Group
                   </button>
