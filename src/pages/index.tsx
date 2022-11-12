@@ -21,8 +21,6 @@ const Home: NextPage = () => {
   const updateTodoStatus = trpc.todo.updateTodoStatus.useMutation();
   const updateTodoFavourite = trpc.todo.updateTodoFavourite.useMutation();
 
-  const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
-
   const handleTodoItemChangeIsFavourite = (item: Todo) => {
     // Prediction
     item.isFavourite = !item.isFavourite;
@@ -169,7 +167,10 @@ const Home: NextPage = () => {
               : null}
           </ul>
 
-          <label htmlFor="create-new-todo-modal" className="mt-6 modal-button btn">
+          <label
+            htmlFor="create-new-todo-modal"
+            className="modal-button btn mt-6"
+          >
             Create new Todo
           </label>
 

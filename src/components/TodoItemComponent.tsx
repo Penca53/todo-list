@@ -26,7 +26,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           </figure>*/}
         </div>
 
-        <div className="mb-3 grid grid-cols-3 flex-col">
+        <div className="mb-3 grid grid-cols-3">
           <div className="col-span-2 gap-4 break-words p-6">
             <h2 className="card-title">{props.todoItem.name}</h2>
             <div>
@@ -34,7 +34,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
             </div>
 
             <div className="mt-2 justify-start">
-              <div className="flex gap-4">
+              <div className="flex gap-2">
                 <input
                   type={"checkbox"}
                   // TODO: allow more than boolean values
@@ -49,7 +49,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
             </div>
           </div>
 
-          <div className="grid h-32 flex-grow justify-end p-6">
+          <div className="grid flex-grow justify-end p-6">
             <button
               className="btn btn-square btn-outline btn-error"
               onClick={() => props.onTodoItemDelete(props.todoItem)}
