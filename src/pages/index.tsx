@@ -9,7 +9,12 @@ import GroupNode from "../components/GroupNode";
 
 const Home: NextPage = () => {
   //const [todos, setTodos] = useState<TodoModel[]>([]);
-  const [addTodo, setAddTodo] = useState<Todo>({} as Todo);
+  const [addTodoName, setAddTodoName] = useState<string | null>(null);
+  const [addTodoDescription, setAddTodoDescription] = useState<string | null>(
+    null
+  );
+  const [addTodoStatus, setAddTodoStatus] = useState<boolean | null>(null);
+
   const [selectedTodoGroup, setSelectedTodoGroup] = useState<TodoGroup | null>(
     null
   );
@@ -58,11 +63,16 @@ const Home: NextPage = () => {
   const handleAddTodoClick = () => {
     setIsAddingTodo(true);
 
+    if (!addTodoName || !addTodoDescription || !addTodoStatus) {
+      setIsAddingTodo(false);
+      return;
+    }
+
     createTodo
       .mutateAsync({
-        name: addTodo.name,
-        description: addTodo.description,
-        status: addTodo.status,
+        name: addTodoName,
+        description: addTodoDescription,
+        status: addTodoStatus,
       })
       .then(() => getTodos.refetch())
       .finally(() => {
@@ -191,7 +201,9 @@ const Home: NextPage = () => {
             checked={isAddTodoModalOpen}
             onChange={(e) => {
               setIsAddTodoModalOpen(e.target.checked);
-              setAddTodo({} as Todo);
+              setAddTodoName(null);
+              setAddTodoDescription(null);
+              setAddTodoStatus(null);
             }}
           />
           <label htmlFor="create-new-todo-modal" className="modal">
@@ -216,13 +228,8 @@ const Home: NextPage = () => {
                       id="name"
                       type="text"
                       placeholder="Name..."
-                      value={addTodo.name}
-                      onChange={(e) => {
-                        setAddTodo((prevState) => ({
-                          ...prevState,
-                          name: e.target.value,
-                        }));
-                      }}
+                      value={addTodoName || ""}
+                      onChange={(e) => setAddTodoName(e.target.value)}
                     />
                   </div>
                   <div className="mb-4">
@@ -236,13 +243,8 @@ const Home: NextPage = () => {
                       className="textarea textarea-bordered w-full max-w-xs"
                       id="description"
                       placeholder="Description..."
-                      value={addTodo.description}
-                      onChange={(e) => {
-                        setAddTodo((prevState) => ({
-                          ...prevState,
-                          description: e.target.value,
-                        }));
-                      }}
+                      value={addTodoDescription || ""}
+                      onChange={(e) => setAddTodoDescription(e.target.value)}
                     />
                   </div>
                   <div className="mb-6">
@@ -256,13 +258,10 @@ const Home: NextPage = () => {
                       className="checkbox checkbox-lg"
                       id="status"
                       type="checkbox"
-                      checked={addTodo.status}
-                      onChange={() => {
-                        setAddTodo((prevState) => ({
-                          ...prevState,
-                          status: !prevState.status,
-                        }));
-                      }}
+                      checked={addTodoStatus || false}
+                      onChange={() =>
+                        setAddTodoStatus((prevState) => !prevState)
+                      }
                     />
                   </div>
                   <div className="flex justify-center">
