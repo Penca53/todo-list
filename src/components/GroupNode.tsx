@@ -5,7 +5,6 @@ import { GroupTreeNode } from "../../types/Todo";
 import { useState } from "react";
 
 interface GroupNodeProps {
-  todos: Todo[];
   groupNode: GroupTreeNode;
   height: number;
   onGroupClick: (group: TodoGroup | null) => void;
@@ -13,17 +12,19 @@ interface GroupNodeProps {
 
 const GroupNode: React.FC<GroupNodeProps> = (props) => {
   const { data: session, status } = useSession();
-  const [addGroup, setAddGroup] = useState<TodoGroup>({} as TodoGroup);
+  const [addGroupName, setAddGroupName] = useState<string | null>();
 
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
 
-  const handleAddGroupClick = () => {
-    console.log(props.groupNode.item);
+  const handleAddGroupClick = (node: GroupTreeNode) => {
+    if (!addGroupName || addGroupName.length <= 0) {
+      return;
+    }
     createTodoGroup
       .mutateAsync({
-        name: addGroup.name,
-        parentGroupId: props.groupNode.item?.id,
+        name: addGroupName,
+        parentGroupId: node.item?.id,
       })
       .then(() => getTodoGroups.refetch());
   };
@@ -85,29 +86,23 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                     New Group Name
                   </label>
 
-                  <input
-                    className="input input-bordered w-full max-w-xs"
-                    id="name"
-                    type="text"
-                    placeholder="Name..."
-                    value={addGroup.name}
-                    onChange={(e) => {
-                      setAddGroup((prevState) => ({
-                        ...prevState,
-                        name: e.target.value,
-                      }));
-                    }}
-                  ></input>
+                <input
+                  className="input input-bordered w-full max-w-xs"
+                  id="name"
+                  type="text"
+                  placeholder="Name..."
+                  value={addGroupName || ""}
+                  onChange={(e) => setAddGroupName(e.target.value)}
+                ></input>
 
-                  <div className="mt-6 flex justify-start">
-                    <button
-                      className="btn rounded"
-                      type="button"
-                      onClick={handleAddGroupClick}
-                    >
-                      Add Group
-                    </button>
-                  </div>
+                <div className="mt-6 flex justify-start">
+                  <button
+                    className="btn rounded"
+                    type="button"
+                    onClick={() => handleAddGroupClick(props.groupNode)}
+                  >
+                    Add Group
+                  </button>
                 </div>
               </form>
             </div>
@@ -119,7 +114,6 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
         {props.groupNode.children.map((child) => (
           <GroupNode
             key={child.item?.id}
-            todos={props.todos}
             groupNode={child}
             height={props.height + 1}
             onGroupClick={props.onGroupClick}
