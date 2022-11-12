@@ -73,6 +73,7 @@ const Home: NextPage = () => {
         name: addTodoName,
         description: addTodoDescription,
         status: addTodoStatus,
+        todoGroupId: selectedTodoGroup?.id,
       })
       .then(() => getTodos.refetch())
       .finally(() => {
