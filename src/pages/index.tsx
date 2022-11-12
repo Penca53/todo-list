@@ -191,8 +191,8 @@ const Home: NextPage = () => {
             checked={isAddTodoModalOpen}
             onChange={(e) => setIsAddTodoModalOpen(e.target.checked)}
           />
-          <div className="modal">
-            <div className="modal-box relative">
+          <label htmlFor="create-new-todo-modal" className="modal">
+            <label className="modal-box relative" htmlFor="">
               <label
                 htmlFor="create-new-todo-modal"
                 className="btn btn-circle btn-sm absolute right-2 top-2"
@@ -275,8 +275,8 @@ const Home: NextPage = () => {
                   </div>
                 </form>
               </div>
-            </div>
-          </div>
+            </label>
+          </label>
         </div>
 
         <div className="modal">
