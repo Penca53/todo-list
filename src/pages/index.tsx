@@ -53,14 +53,18 @@ const Home: NextPage = () => {
       .then(() => getTodos.refetch());
   };
 
+  const [isAddingTodo, setIsAddingTodo] = useState(false);
   const handleAddTodoClick = () => {
+    setIsAddingTodo(true);
+
     createTodo
       .mutateAsync({
         name: addTodo.name,
         description: addTodo.description,
         status: addTodo.status,
       })
-      .then(() => getTodos.refetch());
+      .then(() => getTodos.refetch())
+      .finally(() => setIsAddingTodo(false));
   };
 
   const handleTodoGroupNodeClick = (group: TodoGroup | null) => {
@@ -169,7 +173,10 @@ const Home: NextPage = () => {
               : null}
           </ul>
 
-          <label htmlFor="create-new-todo-modal" className="mt-6 modal-button btn">
+          <label
+            htmlFor="create-new-todo-modal"
+            className="modal-button btn mt-6"
+          >
             Create new Todo
           </label>
 
@@ -251,7 +258,9 @@ const Home: NextPage = () => {
                   </div>
                   <div className="flex justify-center">
                     <button
-                      className="btn rounded"
+                      className={
+                        "btn rounded " + (isAddingTodo ? "loading" : "")
+                      }
                       type="button"
                       onClick={handleAddTodoClick}
                     >
