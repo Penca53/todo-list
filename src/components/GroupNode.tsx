@@ -22,6 +22,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
     createTodoGroup
       .mutateAsync({
         name: addGroup.name,
+        parentGroupId: props.groupNode.item?.id,
       })
       .then(() => getTodoGroups.refetch());
   };
