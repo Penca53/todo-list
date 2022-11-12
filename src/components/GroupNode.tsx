@@ -12,16 +12,18 @@ interface GroupNodeProps {
 
 const GroupNode: React.FC<GroupNodeProps> = (props) => {
   const { data: session, status } = useSession();
-  const [addGroup, setAddGroup] = useState<TodoGroup>({} as TodoGroup);
+  const [addGroupName, setAddGroupName] = useState<string | null>();
 
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
 
   const handleAddGroupClick = () => {
-    console.log(props.groupNode.item);
+    if (!addGroupName || addGroupName.length <= 0) {
+      return;
+    }
     createTodoGroup
       .mutateAsync({
-        name: addGroup.name,
+        name: addGroupName,
         parentGroupId: props.groupNode.item?.id,
       })
       .then(() => getTodoGroups.refetch());
@@ -83,20 +85,15 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                   id="name"
                   type="text"
                   placeholder="Name..."
-                  value={addGroup.name}
-                  onChange={(e) => {
-                    setAddGroup((prevState) => ({
-                      ...prevState,
-                      name: e.target.value,
-                    }));
-                  }}
+                  value={addGroupName || ""}
+                  onChange={(e) => setAddGroupName(e.target.value)}
                 ></input>
 
                 <div className="mt-6 flex justify-start">
                   <button
                     className="btn rounded"
                     type="button"
-                    onClick={handleAddGroupClick}
+                    onClick={() => handleAddGroupClick()}
                   >
                     Add Group
                   </button>
