@@ -41,17 +41,9 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
             : session?.user.name}
         </button>
 
-      <label
-        htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
-        className="modal-button btn btn-ghost justify-end"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="h-6 w-6"
+        <label
+          htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
+          className="modal-button btn btn-ghost justify-end"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -69,30 +61,26 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
           </svg>
         </label>
 
-      <input
-        type="checkbox"
-        id={"create-new-group-modal" + props.groupNode.item?.id}
-        className="modal-toggle"
-      />
+        <input
+          type="checkbox"
+          id={"create-new-group-modal" + props.groupNode.item?.id}
+          className="modal-toggle"
+        />
 
-      <div className="modal">
-        <div className="modal-box relative">
-          <label
-            htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
-            className="btn btn-circle btn-sm absolute right-2 top-2"
-          >
-            ✕
-          </label>
+        <div className="modal">
+          <div className="modal-box relative">
+            <label
+              htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
+              className="btn btn-circle btn-sm absolute right-2 top-2"
+            >
+              ✕
+            </label>
 
             <div>
               <form className="mb-4 rounded px-8 pt-3">
-                <div className="mb-4">
-                  <label
-                    className="mb-2 block text-sm font-bold"
-                    htmlFor="name"
-                  >
-                    New Group Name
-                  </label>
+                <label className="mb-2 block text-sm font-bold" htmlFor="name">
+                  New Group Name
+                </label>
 
                 <input
                   className="input input-bordered w-full max-w-xs"
