@@ -189,7 +189,10 @@ const Home: NextPage = () => {
             id="create-new-todo-modal"
             className="modal-toggle"
             checked={isAddTodoModalOpen}
-            onChange={(e) => setIsAddTodoModalOpen(e.target.checked)}
+            onChange={(e) => {
+              setIsAddTodoModalOpen(e.target.checked);
+              setAddTodo({} as Todo);
+            }}
           />
           <label htmlFor="create-new-todo-modal" className="modal">
             <label className="modal-box relative" htmlFor="">
