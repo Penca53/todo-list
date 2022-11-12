@@ -17,14 +17,14 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
 
-  const handleAddGroupClick = () => {
+  const handleAddGroupClick = (node: GroupTreeNode) => {
     if (!addGroupName || addGroupName.length <= 0) {
       return;
     }
     createTodoGroup
       .mutateAsync({
         name: addGroupName,
-        parentGroupId: props.groupNode.item?.id,
+        parentGroupId: node.item?.id,
       })
       .then(() => getTodoGroups.refetch());
   };
@@ -93,7 +93,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                   <button
                     className="btn rounded"
                     type="button"
-                    onClick={() => handleAddGroupClick()}
+                    onClick={() => handleAddGroupClick(props.groupNode)}
                   >
                     Add Group
                   </button>
