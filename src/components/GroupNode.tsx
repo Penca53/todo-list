@@ -123,7 +123,12 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="h-5 w-5 transition-transform hover:scale-110 active:-rotate-90"
+              className={
+                "h-5 w-5 hover:scale-110" +
+                (display === "hidden"
+                  ? " -rotate-90 transition-transform"
+                  : " rotate-0 transition-transform")
+              }
             >
               <path
                 strokeLinecap="round"
