@@ -17,7 +17,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
 
-  const [display, setDisplay] = useState("block");
+  const [collapsed, setCollapsed] = useState("block");
 
   const handleAddGroupClick = () => {
     if (!addGroupName || addGroupName.length <= 0) {
@@ -113,7 +113,9 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
 
           <button
             onClick={() => {
-              display === "block" ? setDisplay("hidden") : setDisplay("block");
+              collapsed === "block"
+                ? setCollapsed("hidden")
+                : setCollapsed("block");
             }}
             className="btn btn-ghost"
           >
@@ -125,7 +127,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
               stroke="currentColor"
               className={
                 "h-5 w-5 hover:scale-110" +
-                (display === "block"
+                (collapsed === "block"
                   ? " -rotate-90 transition-transform"
                   : " rotate-0 transition-transform")
               }
@@ -140,7 +142,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
         </div>
       </div>
 
-      <div className={display}>
+      <div className={collapsed}>
         {props.groupNode.children.map((child) => (
           <GroupNode
             key={child.item?.id}
