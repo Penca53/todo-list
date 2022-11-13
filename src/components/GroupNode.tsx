@@ -43,91 +43,96 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
             : session?.user.name}
         </button>
 
-        <label
-          htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
-          className="modal-button btn btn-ghost"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="h-6 w-6"
+        <div>
+          <label
+            htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
+            className="modal-button btn btn-ghost"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </label>
-
-        <input
-          type="checkbox"
-          id={"create-new-group-modal" + props.groupNode.item?.id}
-          className="modal-toggle"
-        />
-
-        <div className="modal">
-          <div className="modal-box relative">
-            <label
-              htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
-              className="btn btn-circle btn-sm absolute right-2 top-2"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-6 w-6 transition hover:scale-110"
             >
-              ✕
-            </label>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </label>
 
-            <div>
-              <form className="mb-4 rounded px-8 pt-3">
-                <label className="mb-2 block text-sm font-bold" htmlFor="name">
-                  New Group Name
-                </label>
+          <input
+            type="checkbox"
+            id={"create-new-group-modal" + props.groupNode.item?.id}
+            className="modal-toggle"
+          />
 
-                <input
-                  className="input input-bordered w-full max-w-xs"
-                  id="name"
-                  type="text"
-                  placeholder="Name..."
-                  value={addGroupName || ""}
-                  onChange={(e) => setAddGroupName(e.target.value)}
-                ></input>
+          <div className="modal">
+            <div className="modal-box relative">
+              <label
+                htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
+                className="btn btn-circle btn-sm absolute right-2 top-2"
+              >
+                ✕
+              </label>
 
-                <div className="mt-6 flex justify-start">
-                  <button
-                    className="btn rounded"
-                    type="button"
-                    onClick={handleAddGroupClick}
+              <div>
+                <form className="mb-4 rounded px-8 pt-3">
+                  <label
+                    className="mb-2 block text-sm font-bold"
+                    htmlFor="name"
                   >
-                    Add Group
-                  </button>
-                </div>
-              </form>
+                    New Group Name
+                  </label>
+
+                  <input
+                    className="input input-bordered w-full max-w-xs"
+                    id="name"
+                    type="text"
+                    placeholder="Name..."
+                    value={addGroupName || ""}
+                    onChange={(e) => setAddGroupName(e.target.value)}
+                  ></input>
+
+                  <div className="mt-6 flex justify-start">
+                    <button
+                      className="btn rounded"
+                      type="button"
+                      onClick={handleAddGroupClick}
+                    >
+                      Add Group
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
 
-        <button
-          onClick={() => {
-            display === "block" ? setDisplay("hidden") : setDisplay("block");
-          }}
-          className="btn btn-ghost"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="h-5 w-5 transition-transform hover:scale-110 active:-rotate-90"
+          <button
+            onClick={() => {
+              display === "block" ? setDisplay("hidden") : setDisplay("block");
+            }}
+            className="btn btn-ghost"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 19.5L8.25 12l7.5-7.5"
-            />
-          </svg>
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-5 w-5 transition-transform hover:scale-110 active:-rotate-90"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 19.5L8.25 12l7.5-7.5"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className={display}>
