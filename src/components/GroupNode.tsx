@@ -125,7 +125,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
               stroke="currentColor"
               className={
                 "h-5 w-5 hover:scale-110" +
-                (display === "hidden"
+                (display === "block"
                   ? " -rotate-90 transition-transform"
                   : " rotate-0 transition-transform")
               }
