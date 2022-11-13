@@ -97,7 +97,7 @@ model TodoGroup {
     userId         String
     user           User        @relation(fields: [userId], references: [id])
     parentGroupId  Int?
-    parentGroup    TodoGroup?  @relation("TodoGroupRelationship", fields: [parentGroupId], references: [id])
+    parentGroup    TodoGroup?  @relation("TodoGroupRelationship", fields: [parentGroupId], references: [id], onDelete: Cascade)
     childrenGroups TodoGroup[] @relation("TodoGroupRelationship")
     todos          Todo[]
     labels         Label[]

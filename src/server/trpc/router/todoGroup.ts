@@ -24,4 +24,18 @@ export const todoGroupRouter = router({
         },
       });
     }),
+
+  deleteTodoGroup: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().int(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      return ctx.prisma.todoGroup.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    }),
 });
