@@ -19,6 +19,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
   const deleteTodoGroup = trpc.todoGroup.deleteTodoGroup.useMutation();
 
   const [collapsed, setCollapsed] = useState("block");
+  const [isAddingGroup, setIsAddingGroup] = useState(false);
 
   const handleAddGroupClick = () => {
     if (!addGroupName || addGroupName.length <= 0) {
@@ -29,7 +30,8 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
         name: addGroupName,
         parentGroupId: props.groupNode.item?.id,
       })
-      .then(() => getTodoGroups.refetch());
+      .then(() => getTodoGroups.refetch())
+      .finally(() => setIsAddingGroup(false));
   };
 
   const handleDeleteGroup = () => {
@@ -38,6 +40,12 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
       .mutateAsync({ id: props.groupNode.item?.id})
       .then(() => getTodoGroups.refetch());
   */
+  };
+
+  const onAddGroupKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleAddGroupClick();
+    }
   };
 
   return (
@@ -54,7 +62,12 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
 
         <div className="flex">
           <div className="dropdown-right dropdown">
-            <label tabIndex={0} className="modal-button btn btn-ghost">
+            <button
+              className="modal-button btn btn-ghost"
+              onClick={() => {
+                setIsAddingGroup(true);
+              }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -69,9 +82,9 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                   d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-            </label>
+            </button>
 
-            <div
+            {/*<div
               tabIndex={0}
               className="dropdown-content rounded-md bg-slate-800"
             >
@@ -104,7 +117,8 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                   </div>
                 </form>
               </div>
-            </div>
+              </div>
+            */}
           </div>
 
           {/*<label
@@ -204,6 +218,21 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
           </button>
         </div>
       </div>
+
+      {isAddingGroup && (
+        <div>
+          <input
+            autoFocus
+            onBlur={() => {
+              setIsAddingGroup(false);
+            }}
+            className="input"
+            onChange={(e) => setAddGroupName(e.target.value)}
+            onKeyDown={(e) => onAddGroupKeyDown(e)}
+            value={addGroupName || ""}
+          />
+        </div>
+      )}
 
       <div className={collapsed + " border-l border-solid border-slate-500"}>
         {props.groupNode.children.map((child) => (
