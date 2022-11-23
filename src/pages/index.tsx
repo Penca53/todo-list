@@ -1,13 +1,15 @@
 import { trpc } from "../utils/trpc";
 import type { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Layout from "../components/Layout";
 import TodoItemComponent from "../components/TodoItemComponent";
 import { Todo, TodoGroup } from "@prisma/client";
 import { GroupTreeNode } from "../../types/Todo";
 import GroupNode from "../components/GroupNode";
+import { useSession } from "next-auth/react";
 
 const Home: NextPage = () => {
+  const { data: session, status } = useSession();
   //const [todos, setTodos] = useState<TodoModel[]>([]);
   const [addTodoName, setAddTodoName] = useState<string | null>(null);
   const [addTodoDescription, setAddTodoDescription] = useState<string | null>(
@@ -20,13 +22,13 @@ const Home: NextPage = () => {
   );
   const getTodos = trpc.todo.getTodos.useQuery();
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
+  const deleteTodoGroup = trpc.todoGroup.deleteTodoGroup.useMutation();
 
   const createTodo = trpc.todo.createTodo.useMutation();
   const deleteTodo = trpc.todo.deleteTodo.useMutation();
   const updateTodoStatus = trpc.todo.updateTodoStatus.useMutation();
   const updateTodoFavourite = trpc.todo.updateTodoFavourite.useMutation();
 
-  const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
   const [isAddTodoModalOpen, setIsAddTodoModalOpen] = useState(false);
 
   const handleTodoItemChangeIsFavourite = (item: Todo) => {
@@ -86,6 +88,21 @@ const Home: NextPage = () => {
     setSelectedTodoGroup(group);
   };
 
+  const handleTodoGroupDeleteClick = () => {
+    if (!selectedTodoGroup) {
+      return;
+    }
+
+    deleteTodoGroup
+      .mutateAsync({
+        id: selectedTodoGroup.id,
+      })
+      .then(() => getTodoGroups.refetch())
+      .finally(() => {
+        setSelectedTodoGroup(null);
+      });
+  };
+
   const createGroupTree = (todoGroups: TodoGroup[]): GroupTreeNode => {
     const root: GroupTreeNode = { item: null, parent: null, children: [] };
 
@@ -138,6 +155,27 @@ const Home: NextPage = () => {
           </ul>
         </div>
         <div className="flex-1 overflow-y-scroll  p-4">
+          <div className="flex w-full items-center gap-4 border-b pt-2 pb-4">
+            <h2 className="w-64 overflow-hidden text-ellipsis text-2xl">
+              {selectedTodoGroup?.name || session?.user.name}
+            </h2>
+
+            <label
+              htmlFor="create-new-todo-modal"
+              className="modal-button btn btn-primary cursor-pointer"
+            >
+              Create Todo
+            </label>
+            {selectedTodoGroup && (
+              <button
+                onClick={() => handleTodoGroupDeleteClick()}
+                className="btn btn-outline btn-error btn-sm ml-auto"
+              >
+                Delete Group
+              </button>
+            )}
+          </div>
+
           <ul className="mt-4">
             {getTodos.isLoading
               ? "Loading..."
@@ -166,13 +204,6 @@ const Home: NextPage = () => {
                 })
               : null}
           </ul>
-
-          <label
-            htmlFor="create-new-todo-modal"
-            className="modal-button btn mt-6"
-          >
-            Create new Todo
-          </label>
 
           <input
             type="checkbox"
@@ -259,18 +290,6 @@ const Home: NextPage = () => {
               </div>
             </label>
           </label>
-        </div>
-
-        <div className="modal">
-          <div className="modal-box relative">
-            <label
-              htmlFor="edit-todo-modal"
-              className="btn btn-circle btn-sm absolute right-2 top-2"
-            >
-              ✕
-            </label>
-            <div>Hello</div>
-          </div>
         </div>
       </div>
     </Layout>
