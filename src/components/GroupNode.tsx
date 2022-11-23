@@ -50,20 +50,20 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
 
   return (
     <div className="ml-6">
-      <div className="btn-ghost flex justify-between rounded-lg">
+      <div className="btn-ghost btn-sm flex h-12 items-center justify-between rounded-lg pl-2 pr-0">
         <button
           onClick={() => props.onGroupClick(props.groupNode.item)}
-          className="btn grow justify-start border-none bg-transparent pl-0 hover:bg-transparent"
+          className="btn btn-sm h-12 grow justify-start border-none bg-transparent pl-0 hover:bg-transparent"
         >
           {props.groupNode.item
             ? props.groupNode.item.name
             : session?.user.name}
         </button>
 
-        <div className="flex">
-          <div className="dropdown-right dropdown">
+        <div className="flex items-center">
+          <div className="dropdown dropdown-right">
             <button
-              className="modal-button btn btn-ghost"
+              className="modal-button btn btn-ghost btn-sm h-12"
               onClick={() => {
                 setIsAddingGroup(true);
               }}
@@ -83,110 +83,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                 />
               </svg>
             </button>
-
-            {/*<div
-              tabIndex={0}
-              className="dropdown-content rounded-md bg-slate-800"
-            >
-              <div>
-                <form className="mb-4 rounded px-8 pt-3">
-                  <label
-                    className="mb-2 block text-sm font-bold"
-                    htmlFor="name"
-                  >
-                    New Group Name
-                  </label>
-
-                  <input
-                    className="input input-bordered w-full max-w-xs"
-                    id="name"
-                    type="text"
-                    placeholder="Name..."
-                    value={addGroupName || ""}
-                    onChange={(e) => setAddGroupName(e.target.value)}
-                  ></input>
-
-                  <div className="mt-6 flex justify-start">
-                    <button
-                      className="btn rounded"
-                      type="button"
-                      onClick={handleAddGroupClick}
-                    >
-                      Add Group
-                    </button>
-                  </div>
-                </form>
-              </div>
-              </div>
-            */}
           </div>
-
-          {/*<label
-            htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
-            className="modal-button btn btn-ghost"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-6 w-6 transition hover:scale-110"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </label>
-
-          <input
-            type="checkbox"
-            id={"create-new-group-modal" + props.groupNode.item?.id}
-            className="modal-toggle"
-          />
-
-          <div className="modal">
-            <div className="modal-box relative">
-              <label
-                htmlFor={"create-new-group-modal" + props.groupNode.item?.id}
-                className="btn btn-circle btn-sm absolute right-2 top-2"
-              >
-                ✕
-              </label>
-
-              <div>
-                <form className="mb-4 rounded px-8 pt-3">
-                  <label
-                    className="mb-2 block text-sm font-bold"
-                    htmlFor="name"
-                  >
-                    New Group Name
-                  </label>
-
-                  <input
-                    className="input input-bordered w-full max-w-xs"
-                    id="name"
-                    type="text"
-                    placeholder="Name..."
-                    value={addGroupName || ""}
-                    onChange={(e) => setAddGroupName(e.target.value)}
-                  ></input>
-
-                  <div className="mt-6 flex justify-start">
-                    <button
-                      className="btn rounded"
-                      type="button"
-                      onClick={handleAddGroupClick}
-                    >
-                      Add Group
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>*/}
 
           <button
             onClick={() => {
@@ -194,7 +91,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                 ? setCollapsed("hidden")
                 : setCollapsed("block");
             }}
-            className="btn btn-ghost"
+            className="btn btn-ghost btn-sm h-12"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -220,13 +117,14 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
       </div>
 
       {isAddingGroup && (
-        <div>
+        <div className="mb-1 mt-2 flex items-center justify-between pl-1">
           <input
-            autoFocus
             onBlur={() => {
               setIsAddingGroup(false);
+              setAddGroupName(null);
             }}
-            className="input"
+            autoFocus
+            className="input input-xs w-full"
             onChange={(e) => setAddGroupName(e.target.value)}
             onKeyDown={(e) => onAddGroupKeyDown(e)}
             value={addGroupName || ""}
