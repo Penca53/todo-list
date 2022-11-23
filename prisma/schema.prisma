@@ -65,7 +65,7 @@ model Todo {
     userId      String
     user        User            @relation(fields: [userId], references: [id])
     todoGroupId Int?
-    todoGroup   TodoGroup?      @relation(fields: [todoGroupId], references: [id])
+    todoGroup   TodoGroup?      @relation(fields: [todoGroupId], references: [id], onDelete: Cascade)
     labels      LabelsOnTodos[]
 }
 
