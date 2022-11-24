@@ -16,7 +16,6 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
 
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
-  const deleteTodoGroup = trpc.todoGroup.deleteTodoGroup.useMutation();
 
   const [collapsed, setCollapsed] = useState("block");
   const [isAddingGroup, setIsAddingGroup] = useState(false);

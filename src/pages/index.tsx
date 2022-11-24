@@ -7,6 +7,30 @@ import { Todo, TodoGroup } from "@prisma/client";
 import { GroupTreeNode } from "../../types/Todo";
 import GroupNode from "../components/GroupNode";
 import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+
+const DragDropContext = dynamic(
+  async () => {
+    const mod = await import("@hello-pangea/dnd");
+    return mod.DragDropContext;
+  },
+  { ssr: false }
+);
+
+const Droppable = dynamic(
+  async () => {
+    const mod = await import("@hello-pangea/dnd");
+    return mod.Droppable;
+  },
+  { ssr: false }
+);
+const Draggable = dynamic(
+  async () => {
+    const mod = await import("@hello-pangea/dnd");
+    return mod.Draggable;
+  },
+  { ssr: false }
+);
 
 const Home: NextPage = () => {
   const { data: session, status } = useSession();
@@ -136,6 +160,30 @@ const Home: NextPage = () => {
     return root;
   };
 
+  interface DataElement {
+    id: string;
+    content: string;
+  }
+  const [items, setItems] = useState<DataElement[]>([
+    { id: "0", content: "Hello0" },
+    { id: "1", content: "Hello1" },
+    { id: "2", content: "Hello2" },
+    { id: "3", content: "Hello3" },
+    { id: "4", content: "Hello4" },
+  ]);
+  const onDragEnd = (result: any) => {
+    if (!getTodos.data) {
+      return;
+    }
+    if (!result.destination) {
+      return;
+    }
+    const newItems = [...getTodos.data];
+    const [removed] = newItems.splice(result.source.index, 1);
+    newItems.splice(result.destination.index, 0, removed!);
+    //setItems(newItems);
+  };
+
   return (
     <Layout>
       <div className="flex h-full">
@@ -176,34 +224,58 @@ const Home: NextPage = () => {
             )}
           </div>
 
-          <ul className="mt-4">
-            {getTodos.isLoading
-              ? "Loading..."
-              : getTodos.isError
-              ? "Error!"
-              : getTodos.data
-              ? getTodos.data.map((todo) => {
-                  if (
-                    (!todo.todoGroupId && !selectedTodoGroup) ||
-                    todo.todoGroupId === selectedTodoGroup?.id
-                  ) {
-                    return (
-                      <TodoItemComponent
-                        todoItem={todo}
-                        key={todo.id}
-                        onTodoItemChangeStatus={handleTodoItemChangeStatus}
-                        onTodoItemChangeIsFavourite={
-                          handleTodoItemChangeIsFavourite
-                        }
-                        onTodoItemDelete={handleTodoItemDelete}
-                      />
-                    );
-                  } else {
-                    return null;
-                  }
-                })
-              : null}
-          </ul>
+          <DragDropContext onDragEnd={(res) => onDragEnd(res)}>
+            <ul className="mt-4">
+              {getTodos.isLoading ? (
+                "Loading..."
+              ) : getTodos.isError ? (
+                "Error!"
+              ) : getTodos.data ? (
+                <Droppable droppableId="todos-droppable">
+                  {(provided) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {getTodos.data
+                        .filter(
+                          (todo) =>
+                            (!todo.todoGroupId && !selectedTodoGroup) ||
+                            todo.todoGroupId === selectedTodoGroup?.id
+                        )
+                        .map((todo, index) => {
+                          return (
+                            <Draggable
+                              key={todo.id}
+                              draggableId={index.toString()}
+                              index={index}
+                            >
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <TodoItemComponent
+                                    todoItem={todo}
+                                    key={todo.id}
+                                    onTodoItemChangeStatus={
+                                      handleTodoItemChangeStatus
+                                    }
+                                    onTodoItemChangeIsFavourite={
+                                      handleTodoItemChangeIsFavourite
+                                    }
+                                    onTodoItemDelete={handleTodoItemDelete}
+                                  />
+                                </div>
+                              )}
+                            </Draggable>
+                          );
+                        })}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              ) : null}
+            </ul>
+          </DragDropContext>
 
           <input
             type="checkbox"
