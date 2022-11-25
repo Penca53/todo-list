@@ -10,7 +10,7 @@ interface TodoItemComponentProps {
 }
 
 const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
-  const [status, setStatus] = useState(false);
+  const [status, setStatus] = useState(props.todoItem.status);
   useDebounce(
     status,
     (newStatus) => props.onTodoItemChangeStatus(props.todoItem, newStatus),
@@ -43,7 +43,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
                   onChange={(e) => setStatus(e.target.checked)}
                 />
                 <h2 className="break-all text-lg text-green-500">
-                  {props.todoItem.status === true ? "Done" : ""}
+                  {status === true ? "Done" : ""}
                 </h2>
               </div>
             </div>
