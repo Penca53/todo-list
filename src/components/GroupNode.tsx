@@ -65,6 +65,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
               className="modal-button btn btn-ghost btn-sm h-12"
               onClick={() => {
                 setIsAddingGroup(true);
+                setAddGroupName(null);
               }}
             >
               <svg
