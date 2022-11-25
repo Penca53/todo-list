@@ -6,11 +6,14 @@ interface TodoItemComponentProps {
   todoItem: Todo;
   onTodoItemChangeIsFavourite: (item: Todo) => void;
   onTodoItemChangeStatus: (item: Todo, status: boolean) => void;
-  onTodoItemDelete: (item: Todo) => void;
+  onTodoItemDelete: (item: Todo) => Promise<void>;
 }
 
 const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
   const [status, setStatus] = useState(props.todoItem.status);
+
+  const [isDeletingTodo, setIsDeletingTodo] = useState(false);
+
   useDebounce(
     status,
     (newStatus) => props.onTodoItemChangeStatus(props.todoItem, newStatus),
@@ -51,23 +54,37 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
 
           <div className="grid flex-grow justify-end p-6">
             <button
-              className="btn btn-square btn-outline btn-error"
-              onClick={() => props.onTodoItemDelete(props.todoItem)}
+              className={
+                "btn btn-square btn-outline btn-error" +
+                (isDeletingTodo ? " loading" : "")
+              }
+              onClick={() => {
+                setIsDeletingTodo(true);
+                console.log(isDeletingTodo);
+
+                props
+                  .onTodoItemDelete(props.todoItem)
+                  .then(() => setIsDeletingTodo(false));
+                console.log(isDeletingTodo);
+              }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              {!isDeletingTodo && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  display="none"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              )}
             </button>
 
             <button

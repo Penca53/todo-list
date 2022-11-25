@@ -8,6 +8,8 @@ import { GroupTreeNode } from "../../types/Todo";
 import GroupNode from "../components/GroupNode";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import { resolve } from "path";
+import { rejects } from "assert";
 
 const DragDropContext = dynamic(
   async () => {
@@ -55,6 +57,8 @@ const Home: NextPage = () => {
 
   const [isAddTodoModalOpen, setIsAddTodoModalOpen] = useState(false);
 
+  const [isDeletingTodoGroup, setIsDeletingTodoGroup] = useState(false);
+
   const handleTodoItemChangeIsFavourite = (item: Todo) => {
     // Prediction
     item.isFavourite = !item.isFavourite;
@@ -77,12 +81,14 @@ const Home: NextPage = () => {
     });
   };
 
-  const handleTodoItemDelete = (item: Todo) => {
-    deleteTodo
+  const handleTodoItemDelete = (item: Todo): Promise<void> => {
+    return deleteTodo
       .mutateAsync({
         id: item.id,
       })
-      .then(() => getTodos.refetch());
+      .then(() => {
+        getTodos.refetch();
+      });
   };
 
   const [isAddingTodo, setIsAddingTodo] = useState(false);
@@ -117,6 +123,8 @@ const Home: NextPage = () => {
       return;
     }
 
+    setIsDeletingTodoGroup(true);
+
     deleteTodoGroup
       .mutateAsync({
         id: selectedTodoGroup.id,
@@ -124,6 +132,7 @@ const Home: NextPage = () => {
       .then(() => getTodoGroups.refetch())
       .finally(() => {
         setSelectedTodoGroup(null);
+        setIsDeletingTodoGroup(false);
       });
   };
 
@@ -217,7 +226,10 @@ const Home: NextPage = () => {
             {selectedTodoGroup && (
               <button
                 onClick={() => handleTodoGroupDeleteClick()}
-                className="btn btn-outline btn-error btn-sm ml-auto"
+                className={
+                  "btn btn-outline btn-error btn-sm ml-auto" +
+                  (isDeletingTodoGroup ? " loading" : " ")
+                }
               >
                 Delete Group
               </button>
