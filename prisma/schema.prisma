@@ -84,8 +84,8 @@ model Label {
     createdAt   DateTime        @default(now())
     updatedAt   DateTime        @updatedAt
     name        String
-    todoGroupId Int
-    todoGroup   TodoGroup       @relation(fields: [todoGroupId], references: [id])
+    todoGroupId Int?
+    todoGroup   TodoGroup?       @relation(fields: [todoGroupId], references: [id])
     todos       LabelsOnTodos[]
 }
 
