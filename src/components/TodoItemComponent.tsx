@@ -102,7 +102,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
 
             <button
               className={
-                "btn btn-ghost btn-circle " +
+                "btn btn-circle btn-ghost " +
                 (props.todoItem.isFavourite
                   ? "stroke-yellow-400"
                   : "stroke-gray-400")
@@ -126,7 +126,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         <div className="border-top card-actions m-3 mb-1.5 flex flex-row justify-between">
           <div className="flex-none">
             <button
-              className="modal-button btn btn-ghost btn-circle btn-sm m-0 p-1"
+              className="modal-button btn btn-circle btn-ghost btn-sm m-0 p-1"
               onClick={() => {
                 handleAddLabelClick();
               }}
@@ -149,7 +149,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           </div>
           <div className="space-x-1.5">
             {labelsOnTodo.map((labelOnTodo) => (
-              <div className="badge badge-outline">
+              <div key={labelOnTodo.labelId} className="badge badge-outline">
                 {labels.find((label) => label.id === labelOnTodo.labelId)!.name}
               </div>
             ))}
@@ -165,6 +165,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
             ? "There are not any labels available on this group."
             : labels.map((label) => (
                 <button
+                  key={label.id}
                   className="badge btn btn-ghost btn-sm m-0 border-stone-300 p-1"
                   onClick={() =>
                     props.onLabelOnTodoChange(label, props.todoItem)

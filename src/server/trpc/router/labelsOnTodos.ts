@@ -6,8 +6,6 @@ export const labelsOnTodosRouter = router({
     return ctx.prisma.labelsOnTodos.findMany();
   }),
 
-  getLabelsOnTodo: protectedProcedure.query(({ ctx }) => {}),
-
   createLabelOnTodo: protectedProcedure
     .input(
       z.object({
