@@ -1,18 +1,33 @@
-import { Todo } from "@prisma/client";
+import { trpc } from "../utils/trpc";
+import { Todo, Label, LabelsOnTodos } from "@prisma/client";
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 
 interface TodoItemComponentProps {
   todoItem: Todo;
+  labels: Label[];
+  labelsOnTodos: LabelsOnTodos[];
   onTodoItemChangeIsFavourite: (item: Todo) => void;
   onTodoItemChangeStatus: (item: Todo, status: boolean) => void;
   onTodoItemDelete: (item: Todo) => Promise<void>;
+  onLabelOnTodoChange: (label: Label, item: Todo) => void;
 }
 
 const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
   const [status, setStatus] = useState(props.todoItem.status);
 
   const [isDeletingTodo, setIsDeletingTodo] = useState(false);
+
+  const [isAddingLabel, setIsAddingLabel] = useState(false);
+
+  const labels = props.labels;
+  const labelsOnTodo = props.labelsOnTodos;
+
+  const handleAddLabelClick = () => {
+    setIsAddingLabel((prev) => !prev);
+  };
+
+  const [addLabel, setAddLabel] = useState<Label | null>(null);
 
   useDebounce(
     status,
@@ -110,31 +125,58 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         </div>
 
         <hr></hr>
-        <div className="border-top card-actions mt-3 mb-3 mr-3 justify-end">
-          <div className="justify-begin">
-            <svg
-              version="1.1"
-              id="Capa_1"
-              xmlns="http://www.w3.org/2000/svg"
-              x="24px"
-              y="24px"
-              viewBox="0 0 490.2 490.2"
+        <div className="border-top card-actions m-3 mb-1.5 flex flex-row justify-between">
+          <div className="flex-none">
+            <button
+              className="modal-button btn btn-ghost btn-circle btn-sm m-0 p-1"
+              onClick={() => {
+                handleAddLabelClick();
+              }}
             >
-              <path
-                d="M418.5,418.5c95.6-95.6,95.6-251.2,0-346.8s-251.2-95.6-346.8,0s-95.6,251.2,0,346.8S322.9,514.1,418.5,418.5z M89,89
-			c86.1-86.1,226.1-86.1,312.2,0s86.1,226.1,0,312.2s-226.1,86.1-312.2,0S3,175.1,89,89z"
-              />
-              <path
-                d="M245.1,336.9c3.4,0,6.4-1.4,8.7-3.6c2.2-2.2,3.6-5.3,3.6-8.7v-67.3h67.3c3.4,0,6.4-1.4,8.7-3.6c2.2-2.2,3.6-5.3,3.6-8.7
-			c0-6.8-5.5-12.3-12.2-12.2h-67.3v-67.3c0-6.8-5.5-12.3-12.2-12.2c-6.8,0-12.3,5.5-12.2,12.2v67.3h-67.3c-6.8,0-12.3,5.5-12.2,12.2
-			c0,6.8,5.5,12.3,12.2,12.2h67.3v67.3C232.8,331.4,238.3,336.9,245.1,336.9z"
-              />
-            </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="h-5 w-5 transition hover:scale-110"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </button>
           </div>
-          <div className="badge badge-outline">Fashion</div>
-          <div className="badge badge-outline">Products</div>
+          <div className="space-x-1.5">
+            {labelsOnTodo.map((labelOnTodo) => (
+              <div className="badge badge-outline">
+                {labels.find((label) => label.id === labelOnTodo.labelId)!.name}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+      {isAddingLabel ? (
+        <div
+          onFocus={() => console.log("focus")}
+          className="card absolute z-10 mt-2 flex w-96 flex-row justify-end space-x-1.5 overflow-auto rounded-md bg-base-200 p-2.5 shadow-xl"
+        >
+          {labels?.length === 0
+            ? "There are not any labels available on this group."
+            : labels.map((label) => (
+                <button
+                  className="badge btn btn-ghost btn-sm m-0 border-stone-300 p-1"
+                  onClick={() =>
+                    props.onLabelOnTodoChange(label, props.todoItem)
+                  }
+                >
+                  {label.name}
+                </button>
+              ))}
+        </div>
+      ) : null}
     </li>
   );
 };

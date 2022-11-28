@@ -1,5 +1,5 @@
 import { trpc } from "../utils/trpc";
-import { Todo, TodoGroup } from "@prisma/client";
+import { Todo, TodoGroup, Label } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { GroupTreeNode } from "../../types/Todo";
 import { useState } from "react";

@@ -3,13 +3,11 @@ import type { NextPage } from "next";
 import { useState } from "react";
 import Layout from "../components/Layout";
 import TodoItemComponent from "../components/TodoItemComponent";
-import { Todo, TodoGroup } from "@prisma/client";
+import { Todo, TodoGroup, Label, LabelsOnTodos } from "@prisma/client";
 import { GroupTreeNode } from "../../types/Todo";
 import GroupNode from "../components/GroupNode";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import { resolve } from "path";
-import { rejects } from "assert";
 
 const DragDropContext = dynamic(
   async () => {
@@ -56,8 +54,19 @@ const Home: NextPage = () => {
   const updateTodoFavourite = trpc.todo.updateTodoFavourite.useMutation();
 
   const [isAddTodoModalOpen, setIsAddTodoModalOpen] = useState(false);
+  const [isAddingTodo, setIsAddingTodo] = useState(false);
 
   const [isDeletingTodoGroup, setIsDeletingTodoGroup] = useState(false);
+
+  const [addLabelName, setAddLabelName] = useState<string | null>(null);
+  const [isAddLabelModalOpen, setIsAddLabelModalOpen] = useState(false);
+  const [isAddingLabel, setIsAddingLabel] = useState(false);
+
+  const getLabels = trpc.label.getLabels.useQuery();
+  const createLabel = trpc.label.createLabel.useMutation();
+
+  const getLabelsOnTodos = trpc.labelsOnTodos.getLabelsOnTodos.useQuery();
+  const createLabelOnTodo = trpc.labelsOnTodos.createLabelOnTodo.useMutation();
 
   const handleTodoItemChangeIsFavourite = (item: Todo) => {
     // Prediction
@@ -91,7 +100,6 @@ const Home: NextPage = () => {
       });
   };
 
-  const [isAddingTodo, setIsAddingTodo] = useState(false);
   const handleAddTodoClick = () => {
     setIsAddingTodo(true);
 
@@ -111,6 +119,38 @@ const Home: NextPage = () => {
       .finally(() => {
         setIsAddingTodo(false);
         setIsAddTodoModalOpen(false);
+      });
+  };
+
+  const handleAddLabelClick = () => {
+    setIsAddingLabel(true);
+
+    if (!addLabelName) {
+      setIsAddingLabel(false);
+      return;
+    }
+
+    createLabel
+      .mutateAsync({
+        name: addLabelName,
+        todoGroupId: selectedTodoGroup?.id,
+      })
+      .then(() => getLabels.refetch())
+      .finally(() => {
+        setIsAddingLabel(false);
+        setIsAddLabelModalOpen(false);
+      });
+  };
+
+  const handleLabelOnTodoChange = (label: Label, todo: Todo) => {
+    createLabelOnTodo
+      .mutateAsync({
+        todoId: todo.id,
+        labelId: label.id,
+      })
+      .then(() => getLabelsOnTodos.refetch())
+      .finally(() => {
+        setIsAddingLabel(false);
       });
   };
 
@@ -223,6 +263,14 @@ const Home: NextPage = () => {
             >
               Create Todo
             </label>
+
+            <label
+              htmlFor="create-new-label-modal"
+              className="modal-button btn btn-outline cursor-pointer"
+            >
+              Create Label
+            </label>
+
             {selectedTodoGroup && (
               <button
                 onClick={() => handleTodoGroupDeleteClick()}
@@ -275,6 +323,24 @@ const Home: NextPage = () => {
                                       handleTodoItemChangeIsFavourite
                                     }
                                     onTodoItemDelete={handleTodoItemDelete}
+                                    labels={
+                                      getLabels.data?.filter(
+                                        (label) =>
+                                          (!label.todoGroupId &&
+                                            !selectedTodoGroup) ||
+                                          label.todoGroupId ===
+                                            selectedTodoGroup?.id
+                                      ) || []
+                                    }
+                                    labelsOnTodos={
+                                      getLabelsOnTodos.data?.filter(
+                                        (labelOnTodo) =>
+                                          labelOnTodo.todoId === todo.id
+                                      ) || []
+                                    }
+                                    onLabelOnTodoChange={
+                                      handleLabelOnTodoChange
+                                    }
                                   />
                                 </div>
                               )}
@@ -368,6 +434,58 @@ const Home: NextPage = () => {
                       onClick={handleAddTodoClick}
                     >
                       Add Todo
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </label>
+          </label>
+
+          <input
+            type="checkbox"
+            id="create-new-label-modal"
+            className="modal-toggle"
+            checked={isAddLabelModalOpen}
+            onChange={(e) => {
+              setIsAddLabelModalOpen(e.target.checked);
+              setAddLabelName(null);
+            }}
+          />
+          <label htmlFor="create-new-label-modal" className="modal">
+            <label className="relative" htmlFor="">
+              <label
+                htmlFor="create-new-label-modal"
+                className="btn btn-circle btn-sm absolute right-0 top-3"
+              >
+                ✕
+              </label>
+              <div>
+                <form className="mb-4 rounded px-8 pt-6 pb-8">
+                  <div className="mb-4">
+                    <label
+                      className="mb-2 block text-sm font-bold"
+                      htmlFor="name"
+                    >
+                      Name
+                    </label>
+                    <input
+                      className="input input-bordered w-full max-w-xs"
+                      id="name"
+                      type="text"
+                      placeholder="Name..."
+                      value={addLabelName || ""}
+                      onChange={(e) => setAddLabelName(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex justify-center">
+                    <button
+                      className={
+                        "btn rounded " + (isAddingLabel ? "loading" : "")
+                      }
+                      type="button"
+                      onClick={handleAddLabelClick}
+                    >
+                      Add Label
                     </button>
                   </div>
                 </form>
