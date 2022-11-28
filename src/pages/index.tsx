@@ -67,6 +67,7 @@ const Home: NextPage = () => {
 
   const getLabelsOnTodos = trpc.labelsOnTodos.getLabelsOnTodos.useQuery();
   const createLabelOnTodo = trpc.labelsOnTodos.createLabelOnTodo.useMutation();
+  const deleteLabelOnTodo = trpc.labelsOnTodos.deleteLabelOnTodo.useMutation();
 
   const handleTodoItemChangeIsFavourite = (item: Todo) => {
     // Prediction
@@ -142,16 +143,41 @@ const Home: NextPage = () => {
       });
   };
 
+  const hasLabelOnTodo = (label: Label, todo: Todo) => {
+    if (
+      getLabelsOnTodos.data?.filter(
+        (labelOnTodo) =>
+          labelOnTodo.labelId === label.id && labelOnTodo.todoId === todo.id
+      )?.length != 0
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const handleLabelOnTodoChange = (label: Label, todo: Todo) => {
-    createLabelOnTodo
-      .mutateAsync({
-        todoId: todo.id,
-        labelId: label.id,
-      })
-      .then(() => getLabelsOnTodos.refetch())
-      .finally(() => {
-        setIsAddingLabel(false);
-      });
+    if (hasLabelOnTodo(label, todo)) {
+      return deleteLabelOnTodo
+        .mutateAsync({
+          todoId: todo.id,
+          labelId: label.id,
+        })
+        .then(() => getLabelsOnTodos.refetch())
+        .finally(() => {
+          setIsAddingLabel(false);
+        });
+    } else {
+      createLabelOnTodo
+        .mutateAsync({
+          todoId: todo.id,
+          labelId: label.id,
+        })
+        .then(() => getLabelsOnTodos.refetch())
+        .finally(() => {
+          setIsAddingLabel(false);
+        });
+    }
   };
 
   const handleTodoGroupNodeClick = (group: TodoGroup | null) => {

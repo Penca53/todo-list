@@ -27,8 +27,6 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
     setIsAddingLabel((prev) => !prev);
   };
 
-  const [addLabel, setAddLabel] = useState<Label | null>(null);
-
   useDebounce(
     status,
     (newStatus) => props.onTodoItemChangeStatus(props.todoItem, newStatus),
@@ -70,7 +68,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           <div className="grid flex-grow justify-end p-6">
             <button
               className={
-                "btn btn-square btn-outline btn-error" +
+                "btn btn-outline btn-error btn-square" +
                 (isDeletingTodo ? " loading" : "")
               }
               onClick={() => {
