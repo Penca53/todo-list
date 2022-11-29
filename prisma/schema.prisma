@@ -76,7 +76,7 @@ model LabelsOnTodos {
     labelId    Int // relation scalar field (used in the `@relation` attribute above)
     assignedAt DateTime @default(now())
 
-    @@id([todoId, labelId])
+    @@unique([todoId, labelId])
 }
 
 model Label {
@@ -85,7 +85,7 @@ model Label {
     updatedAt   DateTime        @updatedAt
     name        String
     todoGroupId Int?
-    todoGroup   TodoGroup?       @relation(fields: [todoGroupId], references: [id], onDelete: Cascade)
+    todoGroup   TodoGroup?      @relation(fields: [todoGroupId], references: [id], onDelete: Cascade)
     todos       LabelsOnTodos[]
 }
 
