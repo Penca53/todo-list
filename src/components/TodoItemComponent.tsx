@@ -34,7 +34,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
   );
 
   return (
-    <li className="mt-2 rounded ">
+    <li className="relative mt-2 rounded ">
       <div className="card w-96 bg-base-100 shadow-xl">
         <div>
           {/*<figure>
@@ -68,7 +68,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           <div className="grid flex-grow justify-end p-6">
             <button
               className={
-                "btn btn-outline btn-error btn-square" +
+                "btn btn-square btn-outline btn-error" +
                 (isDeletingTodo ? " loading" : "")
               }
               onClick={() => {
@@ -102,7 +102,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
 
             <button
               className={
-                "btn btn-circle btn-ghost " +
+                "btn btn-ghost btn-circle " +
                 (props.todoItem.isFavourite
                   ? "stroke-yellow-400"
                   : "stroke-gray-400")
@@ -126,7 +126,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         <div className="border-top card-actions m-3 mb-1.5 flex flex-row justify-between">
           <div className="flex-none">
             <button
-              className="modal-button btn btn-circle btn-ghost btn-sm m-0 p-1"
+              className="modal-button btn btn-ghost btn-circle btn-sm m-0 p-1"
               onClick={() => {
                 handleAddLabelClick();
               }}
@@ -157,16 +157,13 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         </div>
       </div>
       {isAddingLabel ? (
-        <div
-          onFocus={() => console.log("focus")}
-          className="card absolute z-10 mt-2 flex w-96 flex-row justify-end space-x-1.5 overflow-auto rounded-md bg-base-200 p-2.5 shadow-xl"
-        >
+        <div className="absolute z-10 mt-2 flex max-h-32 w-96 flex-wrap justify-end gap-2 space-x-1.5 overflow-y-auto rounded-md bg-base-200 p-2.5 opacity-90 shadow-xl">
           {labels?.length === 0
             ? "There are not any labels available on this group."
             : labels.map((label) => (
                 <button
                   key={label.id}
-                  className="badge btn btn-ghost btn-sm m-0 border-stone-300 p-1"
+                  className="btn btn-sm block max-w-xs overflow-hidden text-ellipsis border-stone-300"
                   onClick={() =>
                     props.onLabelOnTodoChange(label, props.todoItem)
                   }

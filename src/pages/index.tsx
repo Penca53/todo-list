@@ -262,7 +262,7 @@ const Home: NextPage = () => {
   return (
     <Layout>
       <div className="flex h-full">
-        <div className="w-96 overflow-y-scroll border-r border-gray-500 p-4 shadow shadow-gray-400">
+        <div className="w-96 overflow-y-scroll border-r border-gray-500 p-4">
           <ul className="mt-4">
             {getTodoGroups.isLoading ? (
               "Loading..."
@@ -277,7 +277,7 @@ const Home: NextPage = () => {
             ) : null}
           </ul>
         </div>
-        <div className="flex-1 overflow-y-scroll  p-4">
+        <div className="flex-1 overflow-y-scroll border-l border-gray-500 p-4">
           <div className="flex w-full items-center gap-4 border-b pt-2 pb-4">
             <h2 className="w-64 overflow-hidden text-ellipsis text-2xl">
               {selectedTodoGroup?.name || session?.user.name}
