@@ -123,7 +123,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         </div>
 
         <hr></hr>
-        <div className="border-top m-3 mb-1.5 flex justify-between">
+        <div className="border-top m-3 mb-1.5 flex items-center justify-between">
           <button
             className="modal-button btn btn-ghost btn-circle btn-sm m-0 p-1"
             onClick={() => {
@@ -145,20 +145,15 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
               />
             </svg>
           </button>
-          <div className="overflow-x-scroll pb-3">
-            <div className="flex gap-2">
-              {labelsOnTodo.map((labelOnTodo) => (
-                <div
-                  key={labelOnTodo.labelId}
-                  className="h-8 max-w-[128px] overflow-clip text-ellipsis whitespace-nowrap rounded border px-2"
-                >
-                  {
-                    labels.find((label) => label.id === labelOnTodo.labelId)!
-                      .name
-                  }
-                </div>
-              ))}
-            </div>
+          <div className="-mb-3 flex gap-2 overflow-x-scroll pb-3">
+            {labelsOnTodo.map((labelOnTodo) => (
+              <div
+                key={labelOnTodo.labelId}
+                className="h-6 max-w-[128px] overflow-clip text-ellipsis whitespace-nowrap rounded border px-2"
+              >
+                {labels.find((label) => label.id === labelOnTodo.labelId)!.name}
+              </div>
+            ))}
           </div>
         </div>
       </div>
