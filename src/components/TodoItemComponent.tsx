@@ -123,36 +123,42 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         </div>
 
         <hr></hr>
-        <div className="border-top card-actions m-3 mb-1.5 flex flex-row justify-between">
-          <div className="flex-none">
-            <button
-              className="modal-button btn btn-ghost btn-circle btn-sm m-0 p-1"
-              onClick={() => {
-                handleAddLabelClick();
-              }}
+        <div className="border-top m-3 mb-1.5 flex justify-between">
+          <button
+            className="modal-button btn btn-ghost btn-circle btn-sm m-0 p-1"
+            onClick={() => {
+              handleAddLabelClick();
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-5 w-5 transition hover:scale-110"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="h-5 w-5 transition hover:scale-110"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </button>
-          </div>
-          <div className="space-x-1.5">
-            {labelsOnTodo.map((labelOnTodo) => (
-              <div key={labelOnTodo.labelId} className="badge badge-outline">
-                {labels.find((label) => label.id === labelOnTodo.labelId)!.name}
-              </div>
-            ))}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </button>
+          <div className="overflow-x-scroll pb-3">
+            <div className="flex gap-2">
+              {labelsOnTodo.map((labelOnTodo) => (
+                <div
+                  key={labelOnTodo.labelId}
+                  className="max-w-xs overflow-clip text-ellipsis rounded border px-2"
+                >
+                  {
+                    labels.find((label) => label.id === labelOnTodo.labelId)!
+                      .name
+                  }
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
