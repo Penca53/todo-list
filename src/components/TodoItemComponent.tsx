@@ -150,7 +150,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
               {labelsOnTodo.map((labelOnTodo) => (
                 <div
                   key={labelOnTodo.labelId}
-                  className="max-w-xs overflow-clip text-ellipsis rounded border px-2"
+                  className="h-8 max-w-[128px] overflow-clip text-ellipsis whitespace-nowrap rounded border px-2"
                 >
                   {
                     labels.find((label) => label.id === labelOnTodo.labelId)!
