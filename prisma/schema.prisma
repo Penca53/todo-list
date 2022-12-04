@@ -68,6 +68,8 @@ model Todo {
     todoGroupId Int?
     todoGroup   TodoGroup?      @relation(fields: [todoGroupId], references: [id], onDelete: Cascade)
     labels      LabelsOnTodos[]
+    categoryId  Int?
+    category    Category?      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }
 
 model LabelsOnTodos {
@@ -90,6 +92,16 @@ model Label {
     todos       LabelsOnTodos[]
 }
 
+model Category {
+    id          Int             @id @default(autoincrement())
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+    name        String
+    todos       Todo[]
+    todoGroupId Int?
+    todoGroup   TodoGroup?      @relation(fields: [todoGroupId], references: [id], onDelete: Cascade)
+}
+
 model TodoGroup {
     id             Int              @id @default(autoincrement())
     createdAt      DateTime         @default(now())
@@ -102,6 +114,7 @@ model TodoGroup {
     childrenGroups TodoGroup[]      @relation("TodoGroupRelationship")
     todos          Todo[]
     labels         Label[]
+    category       Category[]
     sharedTo       TodoGroupShare[]
 }
 
