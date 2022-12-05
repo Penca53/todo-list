@@ -11,6 +11,8 @@ interface TodoItemComponentProps {
   onTodoItemChangeStatus: (item: Todo, status: boolean) => void;
   onTodoItemDelete: (item: Todo) => Promise<void>;
   onLabelOnTodoChange: (label: Label, item: Todo) => void;
+
+  // TO DO: onTodoItemChangeCategory
 }
 
 const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
@@ -36,12 +38,6 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
   return (
     <li className="relative mt-2 rounded ">
       <div className="card w-96 bg-base-100 shadow-xl">
-        <div>
-          {/*<figure>
-           <img src="https://placeimg.com/400/225/arch" alt="Shoes" />
-          </figure>*/}
-        </div>
-
         <div className="mb-3 grid grid-cols-3">
           <div className="col-span-2 gap-4 break-words p-6">
             <h2 className="card-title">{props.todoItem.name}</h2>
@@ -68,7 +64,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           <div className="grid flex-grow justify-end p-6">
             <button
               className={
-                "btn btn-square btn-outline btn-error" +
+                "btn btn-outline btn-error btn-square" +
                 (isDeletingTodo ? " loading" : "")
               }
               onClick={() => {
@@ -102,7 +98,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
 
             <button
               className={
-                "btn btn-ghost btn-circle " +
+                "btn btn-circle btn-ghost " +
                 (props.todoItem.isFavourite
                   ? "stroke-yellow-400"
                   : "stroke-gray-400")
@@ -125,7 +121,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         <hr></hr>
         <div className="border-top m-3 mb-1.5 flex items-center justify-between">
           <button
-            className="modal-button btn btn-ghost btn-circle btn-sm m-0 p-1"
+            className="modal-button btn btn-circle btn-ghost btn-sm m-0 p-1"
             onClick={() => {
               handleAddLabelClick();
             }}
