@@ -15,6 +15,7 @@ export const todoRouter = router({
         description: z.string(),
         status: z.boolean().default(false),
         todoGroupId: z.number().int().nullish(),
+        categoryId: z.number().int().nullish(),
       })
     )
     .mutation(({ ctx, input }) => {
@@ -26,6 +27,7 @@ export const todoRouter = router({
           isFavourite: false,
           userId: ctx.session.user.id,
           todoGroupId: input.todoGroupId,
+          categoryId: input.categoryId,
         },
       });
     }),
