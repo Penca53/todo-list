@@ -11,7 +11,7 @@ interface TodoItemComponentProps {
   onTodoItemChangeStatus: (item: Todo, status: boolean) => void;
   onTodoItemDelete: (item: Todo) => Promise<void>;
   onLabelOnTodoChange: (label: Label, item: Todo) => void;
-
+  onLabelDelete: (label: Label) => Promise<void>;
   // TO DO: onTodoItemChangeCategory
 }
 
@@ -21,6 +21,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
   const [isDeletingTodo, setIsDeletingTodo] = useState(false);
 
   const [isAddingLabel, setIsAddingLabel] = useState(false);
+  const [isDeletingLabel, setIsDeletingLabel] = useState(false);
 
   const labels = props.labels;
   const labelsOnTodo = props.labelsOnTodos;
@@ -64,8 +65,8 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           <div className="grid flex-grow justify-end p-6">
             <button
               className={
-                "btn btn-outline btn-error btn-square" +
-                (isDeletingTodo ? " loading" : "")
+                "btn btn-square btn-outline btn-error" +
+                (isDeletingTodo ? " loading" : null)
               }
               onClick={() => {
                 setIsDeletingTodo(true);
@@ -98,7 +99,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
 
             <button
               className={
-                "btn btn-circle btn-ghost " +
+                "btn btn-ghost btn-circle " +
                 (props.todoItem.isFavourite
                   ? "stroke-yellow-400"
                   : "stroke-gray-400")
@@ -121,7 +122,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         <hr></hr>
         <div className="border-top m-3 mb-1.5 flex items-center justify-between">
           <button
-            className="modal-button btn btn-circle btn-ghost btn-sm m-0 p-1"
+            className="modal-button btn btn-ghost btn-circle btn-sm m-0 p-1"
             onClick={() => {
               handleAddLabelClick();
             }}
@@ -158,15 +159,48 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           {labels?.length === 0
             ? "There are not any labels available on this group."
             : labels.map((label) => (
-                <button
-                  key={label.id}
-                  className="btn btn-sm block max-w-xs overflow-hidden text-ellipsis border-stone-300"
-                  onClick={() =>
-                    props.onLabelOnTodoChange(label, props.todoItem)
-                  }
-                >
-                  {label.name}
-                </button>
+                <div className="flex">
+                  <button
+                    className={
+                      "btn btn-outline btn-error btn-sm " +
+                      (isDeletingLabel ? " loading" : null)
+                    }
+                    onClick={() => {
+                      setIsDeletingLabel(true);
+
+                      props
+                        .onLabelDelete(label)
+                        .then(() => setIsDeletingLabel(false));
+                    }}
+                  >
+                    {!isDeletingLabel && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        display="none"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                  <button
+                    key={label.id}
+                    className="btn btn-sm block max-w-xs overflow-hidden text-ellipsis border-stone-300"
+                    onClick={() =>
+                      props.onLabelOnTodoChange(label, props.todoItem)
+                    }
+                  >
+                    {label.name}
+                  </button>
+                </div>
               ))}
         </div>
       ) : null}

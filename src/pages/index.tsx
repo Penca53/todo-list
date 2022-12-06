@@ -53,6 +53,7 @@ const Home: NextPage = () => {
   const getLabels = trpc.label.getLabels.useQuery();
   const createLabel = trpc.label.createLabel.useMutation();
   // TO DO: handle label deletion
+  const deleteLabel = trpc.label.deleteLabel.useMutation();
 
   const getLabelsOnTodos = trpc.labelsOnTodos.getLabelsOnTodos.useQuery();
   const createLabelOnTodo = trpc.labelsOnTodos.createLabelOnTodo.useMutation();
@@ -159,6 +160,12 @@ const Home: NextPage = () => {
         setIsAddingLabel(false);
         setIsAddLabelModalOpen(false);
       });
+  };
+
+  const handleLabelDelete = (item: Label): Promise<void> => {
+    return deleteLabel.mutateAsync({ id: item.id }).then(() => {
+      getLabels.refetch();
+    });
   };
 
   const hasLabelOnTodo = (label: Label, todo: Todo) => {
@@ -389,83 +396,88 @@ const Home: NextPage = () => {
                             Not Assigned todos
                           </h2>
                         </div>
-                        <ul className="mt-4">
-                          {getTodos.isLoading ? (
-                            "Loading..."
-                          ) : getTodos.isError ? (
-                            "Error!"
-                          ) : getTodos.data ? (
-                            <Droppable droppableId="todos-droppable">
-                              {(provided) => (
-                                <div
-                                  {...provided.droppableProps}
-                                  ref={provided.innerRef}
-                                >
-                                  {getTodos.data
-                                    .filter(
-                                      (todo) =>
-                                        ((!todo.todoGroupId &&
-                                          !selectedTodoGroup) ||
-                                          todo.todoGroupId ===
-                                            selectedTodoGroup?.id) &&
-                                        !todo.categoryId
-                                    )
-                                    .map((todo, index) => {
-                                      return (
-                                        <Draggable
-                                          key={todo.id}
-                                          draggableId={index.toString()}
-                                          index={index}
-                                        >
-                                          {(provided) => (
-                                            <div
-                                              ref={provided.innerRef}
-                                              {...provided.draggableProps}
-                                              {...provided.dragHandleProps}
-                                            >
-                                              <TodoItemComponent
-                                                todoItem={todo}
-                                                key={todo.id}
-                                                onTodoItemChangeStatus={
-                                                  handleTodoItemChangeStatus
-                                                }
-                                                onTodoItemChangeIsFavourite={
-                                                  handleTodoItemChangeIsFavourite
-                                                }
-                                                onTodoItemDelete={
-                                                  handleTodoItemDelete
-                                                }
-                                                labels={
-                                                  getLabels.data?.filter(
-                                                    (label) =>
-                                                      (!label.todoGroupId &&
-                                                        !selectedTodoGroup) ||
-                                                      label.todoGroupId ===
-                                                        selectedTodoGroup?.id
-                                                  ) || []
-                                                }
-                                                labelsOnTodos={
-                                                  getLabelsOnTodos.data?.filter(
-                                                    (labelOnTodo) =>
-                                                      labelOnTodo.todoId ===
-                                                      todo.id
-                                                  ) || []
-                                                }
-                                                onLabelOnTodoChange={
-                                                  handleLabelOnTodoChange
-                                                }
-                                              />
-                                            </div>
-                                          )}
-                                        </Draggable>
-                                      );
-                                    })}
-                                  {provided.placeholder}
-                                </div>
-                              )}
-                            </Droppable>
-                          ) : null}
-                        </ul>
+                        <div>
+                          <ul className="mt-4">
+                            {getTodos.isLoading ? (
+                              "Loading..."
+                            ) : getTodos.isError ? (
+                              "Error!"
+                            ) : getTodos.data ? (
+                              <Droppable droppableId="todos-droppable">
+                                {(provided) => (
+                                  <div
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    {getTodos.data
+                                      .filter(
+                                        (todo) =>
+                                          ((!todo.todoGroupId &&
+                                            !selectedTodoGroup) ||
+                                            todo.todoGroupId ===
+                                              selectedTodoGroup?.id) &&
+                                          !todo.categoryId
+                                      )
+                                      .map((todo, index) => {
+                                        return (
+                                          <Draggable
+                                            key={todo.id}
+                                            draggableId={index.toString()}
+                                            index={index}
+                                          >
+                                            {(provided) => (
+                                              <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                              >
+                                                <TodoItemComponent
+                                                  todoItem={todo}
+                                                  key={todo.id}
+                                                  onTodoItemChangeStatus={
+                                                    handleTodoItemChangeStatus
+                                                  }
+                                                  onTodoItemChangeIsFavourite={
+                                                    handleTodoItemChangeIsFavourite
+                                                  }
+                                                  onTodoItemDelete={
+                                                    handleTodoItemDelete
+                                                  }
+                                                  labels={
+                                                    getLabels.data?.filter(
+                                                      (label) =>
+                                                        (!label.todoGroupId &&
+                                                          !selectedTodoGroup) ||
+                                                        label.todoGroupId ===
+                                                          selectedTodoGroup?.id
+                                                    ) || []
+                                                  }
+                                                  labelsOnTodos={
+                                                    getLabelsOnTodos.data?.filter(
+                                                      (labelOnTodo) =>
+                                                        labelOnTodo.todoId ===
+                                                        todo.id
+                                                    ) || []
+                                                  }
+                                                  onLabelOnTodoChange={
+                                                    handleLabelOnTodoChange
+                                                  }
+                                                  onLabelDelete={
+                                                    handleLabelDelete
+                                                  }
+                                                />
+                                              </div>
+                                            )}
+                                          </Draggable>
+                                        );
+                                      })}
+                                    {provided.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
+                            ) : null}
+                          </ul>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -487,7 +499,7 @@ const Home: NextPage = () => {
                               </h2>
                               <button
                                 className={
-                                  "btn btn-outline btn-error btn-square scale-90 " +
+                                  "btn btn-square btn-outline btn-error scale-90 " +
                                   (isDeletingCategory ? " loading" : null)
                                 }
                                 onClick={() =>
@@ -579,6 +591,9 @@ const Home: NextPage = () => {
                                                     }
                                                     onLabelOnTodoChange={
                                                       handleLabelOnTodoChange
+                                                    }
+                                                    onLabelDelete={
+                                                      handleLabelDelete
                                                     }
                                                   />
                                                 </div>
