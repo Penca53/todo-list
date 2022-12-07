@@ -1,5 +1,6 @@
 import { trpc } from "../utils/trpc";
 import { Todo, Label, LabelsOnTodos } from "@prisma/client";
+import LabelComponent from "./LabelComponent";
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 
@@ -148,7 +149,8 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
                 key={labelOnTodo.labelId}
                 className="h-6 max-w-[128px] overflow-clip text-ellipsis whitespace-nowrap rounded border px-2"
               >
-                {labels.find((label) => label.id === labelOnTodo.labelId)!.name}
+                {labels.find((label) => label.id === labelOnTodo.labelId)
+                  ?.name || ""}
               </div>
             ))}
           </div>
@@ -159,53 +161,63 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           {labels?.length === 0
             ? "There are not any labels available on this group."
             : labels.map((label) => (
-                <div className="flex">
-                  <button
-                    className={
-                      "btn btn-outline btn-error btn-sm " +
-                      (isDeletingLabel ? " loading" : null)
-                    }
-                    onClick={() => {
-                      setIsDeletingLabel(true);
-
-                      props
-                        .onLabelDelete(label)
-                        .then(() => setIsDeletingLabel(false));
-                    }}
-                  >
-                    {!isDeletingLabel && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        display="none"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    )}
-                  </button>
-                  <button
-                    key={label.id}
-                    className="btn btn-sm block max-w-xs overflow-hidden text-ellipsis border-stone-300"
-                    onClick={() =>
-                      props.onLabelOnTodoChange(label, props.todoItem)
-                    }
-                  >
-                    {label.name}
-                  </button>
-                </div>
+                <LabelComponent
+                  key={label.id}
+                  todoItem={props.todoItem}
+                  label={label}
+                  onLabelOnTodoChange={props.onLabelOnTodoChange}
+                  onLabelDelete={props.onLabelDelete}
+                />
               ))}
         </div>
       ) : null}
     </li>
   );
 };
+
+/*
+  <div className="flex">
+    <button
+      className={
+        "btn btn-outline btn-error btn-sm " +
+        (isDeletingLabel ? " loading" : null)
+      }
+      onClick={() => {
+        setIsDeletingLabel(true);
+
+        props
+          .onLabelDelete(label)
+          .then(() => setIsDeletingLabel(false));
+      }}
+    >
+      {!isDeletingLabel && (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-3 w-3"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          display="none"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      )}
+    </button>
+    <button
+      key={label.id}
+      className="btn btn-sm block max-w-xs overflow-hidden text-ellipsis border-stone-300"
+      onClick={() =>
+        props.onLabelOnTodoChange(label, props.todoItem)
+      }
+    >
+      {label.name}
+    </button>
+  </div>
+*/
 
 export default TodoItemComponent;

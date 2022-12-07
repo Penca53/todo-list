@@ -165,6 +165,7 @@ const Home: NextPage = () => {
   const handleLabelDelete = (item: Label): Promise<void> => {
     return deleteLabel.mutateAsync({ id: item.id }).then(() => {
       getLabels.refetch();
+      getLabelsOnTodos.refetch();
     });
   };
 
@@ -491,7 +492,10 @@ const Home: NextPage = () => {
                     )
                     .map((category) => {
                       return (
-                        <div className="mt-4 w-[28rem] flex-col overflow-hidden overflow-y-auto rounded-lg border  border-gray-500 p-4">
+                        <div
+                          key={category.id}
+                          className="mt-4 w-[28rem] flex-col overflow-hidden overflow-y-auto rounded-lg border  border-gray-500 p-4"
+                        >
                           <div className="px-4">
                             <div className="mb-4 flex justify-between border-b border-gray-500 pb-2">
                               <h2 className="w-64 self-end overflow-hidden text-ellipsis text-2xl">
