@@ -1,6 +1,7 @@
 import { trpc } from "../utils/trpc";
 import { Todo, Label, LabelsOnTodos } from "@prisma/client";
 import { useState } from "react";
+import useDebounce from "../hooks/useDebounce";
 
 interface LabelComponentProps {
   todoItem: Todo;
@@ -11,6 +12,14 @@ interface LabelComponentProps {
 
 const LabelComponent: React.FC<LabelComponentProps> = (props) => {
   const [isDeletingLabel, setIsDeletingLabel] = useState(false);
+
+  const [status, setStatus] = useState(false);
+
+  useDebounce(
+    status,
+    () => props.onLabelOnTodoChange(props.label, props.todoItem),
+    500
+  );
 
   return (
     <div className="flex">
@@ -47,7 +56,7 @@ const LabelComponent: React.FC<LabelComponentProps> = (props) => {
       </button>
       <button
         className="btn btn-sm block max-w-xs overflow-hidden text-ellipsis border-stone-300"
-        onClick={() => props.onLabelOnTodoChange(props.label, props.todoItem)}
+        onClick={() => setStatus((prevState) => !prevState)}
       >
         {props.label.name}
       </button>
