@@ -5,6 +5,7 @@ import { todoRouter } from "./todo";
 import { todoGroupRouter } from "./todoGroup";
 import { labelRouter } from "./label";
 import { labelsOnTodosRouter } from "./labelsOnTodos";
+import { todoGroupShareRouter } from "./todoGroupShare";
 import { categoryRouter } from "./category";
 
 export const appRouter = router({
@@ -12,6 +13,7 @@ export const appRouter = router({
   todoGroup: todoGroupRouter,
   label: labelRouter,
   labelsOnTodos: labelsOnTodosRouter,
+  todoGroupShare: todoGroupShareRouter,
   category: categoryRouter,
 });
 

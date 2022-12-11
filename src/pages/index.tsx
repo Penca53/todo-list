@@ -45,6 +45,8 @@ const Home: NextPage = () => {
   const getTodos = trpc.todo.getTodos.useQuery();
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const deleteTodoGroup = trpc.todoGroup.deleteTodoGroup.useMutation();
+  const getSharedTodoGroups =
+    trpc.todoGroupShare.getSharedTodoGroups.useQuery();
 
   const createTodo = trpc.todo.createTodo.useMutation();
   const deleteTodo = trpc.todo.deleteTodo.useMutation();
@@ -344,6 +346,18 @@ const Home: NextPage = () => {
                 onGroupClick={handleTodoGroupNodeClick}
               />
             ) : null}
+          </ul>
+
+          <ul className="mt-4">
+            {getSharedTodoGroups.isLoading
+              ? "Loading..."
+              : getSharedTodoGroups.isError
+              ? "Error!"
+              : getSharedTodoGroups.data
+              ? getSharedTodoGroups.data.map((item) => (
+                  <p key={item.todoGroup.id}>{item.todoGroup.name}</p>
+                ))
+              : null}
           </ul>
         </div>
         <div className="flex-1 overflow-y-scroll border-l border-gray-500 p-4">
