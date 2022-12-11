@@ -1,5 +1,6 @@
 import { trpc } from "../utils/trpc";
 import { Todo, Label, LabelsOnTodos } from "@prisma/client";
+import LabelComponent from "./LabelComponent";
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 
@@ -11,6 +12,8 @@ interface TodoItemComponentProps {
   onTodoItemChangeStatus: (item: Todo, status: boolean) => void;
   onTodoItemDelete: (item: Todo) => Promise<void>;
   onLabelOnTodoChange: (label: Label, item: Todo) => void;
+  onLabelDelete: (label: Label) => Promise<void>;
+  // TO DO: onTodoItemChangeCategory
 }
 
 const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
@@ -19,6 +22,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
   const [isDeletingTodo, setIsDeletingTodo] = useState(false);
 
   const [isAddingLabel, setIsAddingLabel] = useState(false);
+  const [isDeletingLabel, setIsDeletingLabel] = useState(false);
 
   const labels = props.labels;
   const labelsOnTodo = props.labelsOnTodos;
@@ -36,12 +40,6 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
   return (
     <li className="relative mt-2 rounded ">
       <div className="card w-96 bg-base-100 shadow-xl">
-        <div>
-          {/*<figure>
-           <img src="https://placeimg.com/400/225/arch" alt="Shoes" />
-          </figure>*/}
-        </div>
-
         <div className="mb-3 grid grid-cols-3">
           <div className="col-span-2 gap-4 break-words p-6">
             <h2 className="card-title">{props.todoItem.name}</h2>
@@ -69,7 +67,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
             <button
               className={
                 "btn btn-square btn-outline btn-error" +
-                (isDeletingTodo ? " loading" : "")
+                (isDeletingTodo ? " loading" : null)
               }
               onClick={() => {
                 setIsDeletingTodo(true);
@@ -151,7 +149,8 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
                 key={labelOnTodo.labelId}
                 className="h-6 max-w-[128px] overflow-clip text-ellipsis whitespace-nowrap rounded border px-2"
               >
-                {labels.find((label) => label.id === labelOnTodo.labelId)!.name}
+                {labels.find((label) => label.id === labelOnTodo.labelId)
+                  ?.name || ""}
               </div>
             ))}
           </div>
@@ -162,20 +161,63 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           {labels?.length === 0
             ? "There are not any labels available on this group."
             : labels.map((label) => (
-                <button
+                <LabelComponent
                   key={label.id}
-                  className="btn btn-sm block max-w-xs overflow-hidden text-ellipsis border-stone-300"
-                  onClick={() =>
-                    props.onLabelOnTodoChange(label, props.todoItem)
-                  }
-                >
-                  {label.name}
-                </button>
+                  todoItem={props.todoItem}
+                  label={label}
+                  onLabelOnTodoChange={props.onLabelOnTodoChange}
+                  onLabelDelete={props.onLabelDelete}
+                />
               ))}
         </div>
       ) : null}
     </li>
   );
 };
+
+/*
+  <div className="flex">
+    <button
+      className={
+        "btn btn-outline btn-error btn-sm " +
+        (isDeletingLabel ? " loading" : null)
+      }
+      onClick={() => {
+        setIsDeletingLabel(true);
+
+        props
+          .onLabelDelete(label)
+          .then(() => setIsDeletingLabel(false));
+      }}
+    >
+      {!isDeletingLabel && (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-3 w-3"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          display="none"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      )}
+    </button>
+    <button
+      key={label.id}
+      className="btn btn-sm block max-w-xs overflow-hidden text-ellipsis border-stone-300"
+      onClick={() =>
+        props.onLabelOnTodoChange(label, props.todoItem)
+      }
+    >
+      {label.name}
+    </button>
+  </div>
+*/
 
 export default TodoItemComponent;
