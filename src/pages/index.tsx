@@ -338,7 +338,7 @@ const Home: NextPage = () => {
               ? "Error!"
               : getSharedTodoGroups.data
               ? getSharedTodoGroups.data.map((item) => (
-                  <p>{item.todoGroup.name}</p>
+                  <p key={item.todoGroup.id}>{item.todoGroup.name}</p>
                 ))
               : null}
           </ul>
