@@ -5,7 +5,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 
 interface CategoryComponentProps {
-  category: Category;
+  category: Category | null;
   onCategoryDelete: (item: Category) => Promise<void>;
 
   todoItems: Todo[];
@@ -27,6 +27,7 @@ const Droppable = dynamic(
   },
   { ssr: false }
 );
+
 const Draggable = dynamic(
   async () => {
     const mod = await import("@hello-pangea/dnd");
@@ -43,45 +44,57 @@ const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
       <div className="px-4">
         <div className="mb-4 flex justify-between border-b border-gray-500 pb-2">
           <h2 className="w-64 self-end overflow-hidden text-ellipsis text-2xl">
-            {props.category.name}
+            {props.category === null
+              ? "Not assigned todos"
+              : props.category.name}
           </h2>
-          <button
-            className={
-              "btn btn-outline btn-error btn-square scale-90 " +
-              (isDeletingCategory ? " loading" : null)
-            }
-            onClick={() => {
-              setIsDeletingCategory(true);
-              props
-                .onCategoryDelete(props.category)
-                .then(() => setIsDeletingCategory(false));
-            }}
-          >
-            {!isDeletingCategory && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                display="none"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            )}
-          </button>
+          {props.category && (
+            <button
+              className={
+                "btn btn-outline btn-error btn-square scale-90 " +
+                (isDeletingCategory ? " loading" : null)
+              }
+              onClick={() => {
+                setIsDeletingCategory(true);
+                props
+                  .onCategoryDelete(props.category!)
+                  .then(() => setIsDeletingCategory(false));
+              }}
+            >
+              {!isDeletingCategory && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  display="none"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              )}
+            </button>
+          )}
         </div>
       </div>
-      <div>
-        <ul className="mt-4">
-          <Droppable droppableId="todos-droppable">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
+      <Droppable
+        droppableId={
+          props.category === null ? "-1" : props.category!.id.toString()
+        }
+      >
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="h-full"
+          >
+            <ul className="mt-4">
+              <div>
                 {props.todoItems.map((todo, index) => {
                   return (
                     <Draggable
@@ -121,10 +134,10 @@ const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
                 })}
                 {provided.placeholder}
               </div>
-            )}
-          </Droppable>
-        </ul>
-      </div>
+            </ul>
+          </div>
+        )}
+      </Droppable>
     </div>
   );
 };

@@ -79,4 +79,23 @@ export const todoRouter = router({
         },
       });
     }),
+
+  updateTodoCategory: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().int(),
+        categoryId: z.number().int().nullish(),
+      })
+    )
+    .mutation(({ ctx, input }) => {
+      console.log(input.categoryId);
+      return ctx.prisma.todo.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          categoryId: input.categoryId,
+        },
+      });
+    }),
 });

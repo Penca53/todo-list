@@ -1,5 +1,5 @@
 import { trpc } from "../utils/trpc";
-import { Todo, Label, LabelsOnTodos } from "@prisma/client";
+import { Todo, Label, LabelsOnTodos, Category } from "@prisma/client";
 import LabelComponent from "./LabelComponent";
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
@@ -13,7 +13,6 @@ interface TodoItemComponentProps {
   onTodoItemDelete: (item: Todo) => Promise<void>;
   onLabelOnTodoChange: (label: Label, item: Todo) => void;
   onLabelDelete: (label: Label) => Promise<void>;
-  // TO DO: onTodoItemChangeCategory
 }
 
 const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
@@ -66,7 +65,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           <div className="grid flex-grow justify-end p-6">
             <button
               className={
-                "btn btn-square btn-outline btn-error" +
+                "btn btn-outline btn-error btn-square" +
                 (isDeletingTodo ? " loading" : null)
               }
               onClick={() => {
@@ -100,7 +99,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
 
             <button
               className={
-                "btn btn-ghost btn-circle " +
+                "btn btn-circle btn-ghost " +
                 (props.todoItem.isFavourite
                   ? "stroke-yellow-400"
                   : "stroke-gray-400")
@@ -123,7 +122,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
         <hr></hr>
         <div className="border-top m-3 mb-1.5 flex items-center justify-between">
           <button
-            className="modal-button btn btn-ghost btn-circle btn-sm m-0 p-1"
+            className="modal-button btn btn-circle btn-ghost btn-sm m-0 p-1"
             onClick={() => {
               handleAddLabelClick();
             }}
