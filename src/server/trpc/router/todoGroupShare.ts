@@ -36,7 +36,11 @@ export const todoGroupShareRouter = router({
       const promises = [];
 
       while (mutationQueue.length > 0) {
-        let currentTodoGroupId = mutationQueue.shift()!;
+        const currentTodoGroupId = mutationQueue.shift();
+        if (!currentTodoGroupId) {
+          throw new Error("Not reachable");
+        }
+
         const sharePromise = ctx.prisma.todoGroupShare.create({
           data: {
             sharedToId: user.id,

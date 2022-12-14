@@ -388,7 +388,9 @@ const Home: NextPage = () => {
                 groupNode={createGroupTree(
                   getSharedTodoGroups.data.map((item) => item.todoGroup)
                 )}
-                onGroupClick={() => {}}
+                onGroupClick={() => {
+                  console.log("Not Implemented");
+                }}
               />
             ) : null}
           </ul>
