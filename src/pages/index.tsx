@@ -47,6 +47,8 @@ const Home: NextPage = () => {
   const deleteTodoGroup = trpc.todoGroup.deleteTodoGroup.useMutation();
   const getSharedTodoGroups =
     trpc.todoGroupShare.getSharedTodoGroups.useQuery();
+  const shareTodoGroup = trpc.todoGroupShare.shareTodoGroup.useMutation();
+  const unshareTodoGroup = trpc.todoGroupShare.unshareTodoGroup.useMutation();
 
   const createTodo = trpc.todo.createTodo.useMutation();
   const deleteTodo = trpc.todo.deleteTodo.useMutation();
@@ -90,6 +92,13 @@ const Home: NextPage = () => {
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
   const [isAddingCategory, setIsAddingCategory] = useState(false);
 
+  const [shareTodoGroupEmail, setShareTodoGroupEmail] = useState<string | null>(
+    null
+  );
+  const [isShareTodoGroupModalOpen, setIsShareTodoGroupModalOpen] =
+    useState(false);
+  const [isSharingTodoGroup, setIsSharingTodoGroup] = useState(false);
+
   const handleTodoItemChangeIsFavourite = (item: Todo) => {
     // Prediction
     item.isFavourite = !item.isFavourite;
@@ -131,6 +140,26 @@ const Home: NextPage = () => {
       })
       .then(() => {
         getTodos.refetch();
+      });
+  };
+
+  const handleShareTodoGroupClick = () => {
+    setIsSharingTodoGroup(true);
+
+    if (!shareTodoGroupEmail || !selectedTodoGroup) {
+      setIsSharingTodoGroup(false);
+      return;
+    }
+
+    shareTodoGroup
+      .mutateAsync({
+        shareToEmail: shareTodoGroupEmail,
+        todoGroupId: selectedTodoGroup.id,
+      })
+      .then(() => getSharedTodoGroups.refetch())
+      .finally(() => {
+        setIsSharingTodoGroup(false);
+        setIsShareTodoGroupModalOpen(false);
       });
   };
 
@@ -349,15 +378,19 @@ const Home: NextPage = () => {
           </ul>
 
           <ul className="mt-4">
-            {getSharedTodoGroups.isLoading
-              ? "Loading..."
-              : getSharedTodoGroups.isError
-              ? "Error!"
-              : getSharedTodoGroups.data
-              ? getSharedTodoGroups.data.map((item) => (
-                  <p key={item.todoGroup.id}>{item.todoGroup.name}</p>
-                ))
-              : null}
+            {getSharedTodoGroups.isLoading ? (
+              "Loading..."
+            ) : getSharedTodoGroups.isError ? (
+              "Error!"
+            ) : getSharedTodoGroups.data ? (
+              <GroupNode
+                height={0}
+                groupNode={createGroupTree(
+                  getSharedTodoGroups.data.map((item) => item.todoGroup)
+                )}
+                onGroupClick={() => {}}
+              />
+            ) : null}
           </ul>
         </div>
         <div className="flex-1 overflow-y-scroll border-l border-gray-500 p-4">
@@ -385,6 +418,13 @@ const Home: NextPage = () => {
               className="modal-button btn btn-outline cursor-pointer"
             >
               Create Category
+            </label>
+
+            <label
+              htmlFor="share-todo-group-modal"
+              className="modal-button btn btn-outline cursor-pointer"
+            >
+              Share Group
             </label>
 
             {selectedTodoGroup && (
@@ -666,6 +706,58 @@ const Home: NextPage = () => {
                       onClick={handleAddCategoryClick}
                     >
                       Add Category
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </label>
+          </label>
+
+          <input
+            type="checkbox"
+            id="share-todo-group-modal"
+            className="modal-toggle"
+            checked={isShareTodoGroupModalOpen}
+            onChange={(e) => {
+              setIsShareTodoGroupModalOpen(e.target.checked);
+              setShareTodoGroupEmail(null);
+            }}
+          />
+          <label htmlFor="share-todo-group-modal" className="modal">
+            <label className="relative" htmlFor="">
+              <label
+                htmlFor="share-todo-group-modal"
+                className="btn btn-circle btn-sm absolute right-0 top-3"
+              >
+                ✕
+              </label>
+              <div>
+                <form className="mb-4 rounded px-8 pt-6 pb-8">
+                  <div className="mb-4 opacity-100">
+                    <label
+                      className="mb-2 block text-sm font-bold"
+                      htmlFor="share-email"
+                    >
+                      Share to:
+                    </label>
+                    <input
+                      className="input input-bordered w-full max-w-xs"
+                      id="share-email"
+                      type="text"
+                      placeholder="Email..."
+                      value={shareTodoGroupEmail || ""}
+                      onChange={(e) => setShareTodoGroupEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex justify-center">
+                    <button
+                      className={
+                        "btn rounded " + (isSharingTodoGroup ? "loading" : "")
+                      }
+                      type="button"
+                      onClick={handleShareTodoGroupClick}
+                    >
+                      Share
                     </button>
                   </div>
                 </form>
