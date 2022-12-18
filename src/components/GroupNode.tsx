@@ -49,7 +49,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
 
   return (
     <div className="ml-6">
-      <div className="btn-ghost btn-sm flex h-12 items-center justify-between rounded-lg pl-2 pr-0">
+      <div className="group btn-ghost btn-sm flex h-12 items-center justify-between rounded-lg pl-2 pr-0 ">
         <button
           onClick={() => props.onGroupClick(props.groupNode.item)}
           className="btn btn-sm h-12 grow justify-start border-none bg-transparent pl-0 hover:bg-transparent"
@@ -60,7 +60,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
         </button>
 
         <div className="flex items-center">
-          <div className="dropdown dropdown-right">
+          <div className="dropdown dropdown-right hidden group-hover:block">
             <button
               className="modal-button btn btn-ghost btn-sm h-12"
               onClick={() => {
@@ -91,7 +91,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
                 ? setCollapsed("hidden")
                 : setCollapsed("block");
             }}
-            className="btn btn-ghost btn-sm h-12"
+            className="btn btn-ghost btn-sm hidden h-12 group-hover:block"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

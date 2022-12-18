@@ -22,7 +22,7 @@ const LabelComponent: React.FC<LabelComponentProps> = (props) => {
   );
 
   return (
-    <div className="flex">
+    <div className="btn-group flex">
       <button
         className={
           "btn btn-outline btn-error btn-sm " +
@@ -55,7 +55,7 @@ const LabelComponent: React.FC<LabelComponentProps> = (props) => {
         )}
       </button>
       <button
-        className="btn btn-sm block max-w-xs overflow-hidden text-ellipsis border-stone-300"
+        className="btn btn-outline btn-sm block max-w-xs overflow-hidden text-ellipsis "
         onClick={() => setStatus((prevState) => !prevState)}
       >
         {props.label.name}

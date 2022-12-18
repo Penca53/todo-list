@@ -37,69 +37,32 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
   );
 
   return (
-    <li className="relative mt-2 rounded ">
-      <div className="card w-96 bg-base-100 shadow-xl">
-        <div className="mb-3 grid grid-cols-3">
-          <div className="col-span-2 gap-4 break-words p-6">
-            <h2 className="card-title">{props.todoItem.name}</h2>
-            <div>
-              <p>{props.todoItem.description}</p>
-            </div>
+    <li className="relative mt-2 rounded">
+      <div className="w-full rounded-xl bg-primary pb-2 shadow-xl">
+        <div className="flex h-24 items-center justify-between">
+          <div className="flex basis-3/4 items-center justify-between gap-6 break-words pl-6 pt-2 pb-3 pr-3">
+            <input
+              type={"checkbox"}
+              // TODO: allow more than boolean values
+              checked={status}
+              className="checkbox checkbox-lg scale-125"
+              onChange={(e) => setStatus(e.target.checked)}
+            />
 
-            <div className="mt-2 justify-start">
-              <div className="flex gap-2">
-                <input
-                  type={"checkbox"}
-                  // TODO: allow more than boolean values
-                  checked={status}
-                  className="checkbox checkbox-lg"
-                  onChange={(e) => setStatus(e.target.checked)}
-                />
-                <h2 className="break-all text-lg text-green-500">
-                  {status === true ? "Done" : ""}
-                </h2>
-              </div>
+            <div className="min-w-0 max-w-[164px] flex-1 justify-start">
+              <p className="overflow-clip text-ellipsis whitespace-nowrap text-xl font-semibold text-gray-900 dark:text-white">
+                {props.todoItem.name}
+              </p>
+              <p className="text-md overflow-clip text-ellipsis whitespace-nowrap text-gray-500 dark:text-gray-400">
+                {props.todoItem.description}
+              </p>
             </div>
           </div>
 
-          <div className="grid flex-grow justify-end p-6">
+          <div className="flex basis-1/4 items-center justify-between gap-3 pr-3 pt-2 pb-3">
             <button
               className={
-                "btn btn-outline btn-error btn-square" +
-                (isDeletingTodo ? " loading" : null)
-              }
-              onClick={() => {
-                setIsDeletingTodo(true);
-                console.log(isDeletingTodo);
-
-                props
-                  .onTodoItemDelete(props.todoItem)
-                  .then(() => setIsDeletingTodo(false));
-                console.log(isDeletingTodo);
-              }}
-            >
-              {!isDeletingTodo && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  display="none"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              )}
-            </button>
-
-            <button
-              className={
-                "btn btn-circle btn-ghost " +
+                "btn btn-circle btn-ghost mt-1 justify-self-center " +
                 (props.todoItem.isFavourite
                   ? "stroke-yellow-400"
                   : "stroke-gray-400")
@@ -116,11 +79,45 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
                 <path d="M15.668 8.626l8.332 1.159-6.065 5.874 1.48 8.341-7.416-3.997-7.416 3.997 1.481-8.341-6.064-5.874 8.331-1.159 3.668-7.626 3.669 7.626zm-6.67.925l-6.818.948 4.963 4.807-1.212 6.825 6.068-3.271 6.069 3.271-1.212-6.826 4.964-4.806-6.819-.948-3.002-6.241-3.001 6.241z" />
               </svg>
             </button>
+
+            <button
+              className={
+                "btn btn-square btn-outline btn-error " +
+                (isDeletingTodo ? " loading" : null)
+              }
+              onClick={() => {
+                setIsDeletingTodo(true);
+                console.log(isDeletingTodo);
+
+                props
+                  .onTodoItemDelete(props.todoItem)
+                  .then(() => setIsDeletingTodo(false));
+                console.log(isDeletingTodo);
+              }}
+            >
+              {!isDeletingTodo && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  display="none"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
 
         <hr></hr>
-        <div className="border-top m-3 mb-1.5 flex items-center justify-between">
+        <div className="border-top flex items-center justify-between px-3 pt-3 pb-1">
           <button
             className="modal-button btn btn-circle btn-ghost btn-sm m-0 p-1"
             onClick={() => {

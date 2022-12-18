@@ -40,9 +40,9 @@ const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
   const [isDeletingCategory, setIsDeletingCategory] = useState(false);
 
   return (
-    <div className="mt-4 w-[28rem] flex-col overflow-hidden overflow-y-auto rounded-lg border  border-gray-500 p-4">
+    <div className="mt-4 w-[28rem] flex-col justify-items-start overflow-hidden overflow-y-auto rounded-lg  border border-gray-500 p-4">
       <div className="px-4">
-        <div className="mb-4 flex justify-between border-b border-gray-500 pb-2">
+        <div className="mb-4 flex h-14 justify-between border-b border-gray-500 pb-2">
           <h2 className="w-64 self-end overflow-hidden text-ellipsis text-2xl">
             {props.category === null
               ? "Not assigned todos"
@@ -82,62 +82,65 @@ const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
           )}
         </div>
       </div>
-      <Droppable
-        droppableId={
-          props.category === null ? "-1" : props.category!.id.toString()
-        }
-      >
-        {(provided) => (
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            className="h-full"
-          >
-            <ul className="mt-4">
-              <div>
-                {props.todoItems.map((todo, index) => {
-                  return (
-                    <Draggable
-                      key={todo.id}
-                      draggableId={todo.id.toString()}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          <TodoItemComponent
-                            todoItem={todo}
-                            key={todo.id}
-                            onTodoItemChangeStatus={
-                              props.onTodoItemChangeStatus
-                            }
-                            onTodoItemChangeIsFavourite={
-                              props.onTodoItemChangeIsFavourite
-                            }
-                            onTodoItemDelete={props.onTodoItemDelete}
-                            labels={props.labels}
-                            labelsOnTodos={
-                              props.labelsOnTodos?.filter(
-                                (labelOnTodo) => labelOnTodo.todoId === todo.id
-                              ) || []
-                            }
-                            onLabelOnTodoChange={props.onLabelOnTodoChange}
-                            onLabelDelete={props.onLabelDelete}
-                          />
-                        </div>
-                      )}
-                    </Draggable>
-                  );
-                })}
-                {provided.placeholder}
-              </div>
-            </ul>
-          </div>
-        )}
-      </Droppable>
+      <div className="px-4">
+        <Droppable
+          droppableId={
+            props.category === null ? "-1" : props.category!.id.toString()
+          }
+        >
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="h-full"
+            >
+              <ul className="mt-4">
+                <div>
+                  {props.todoItems.map((todo, index) => {
+                    return (
+                      <Draggable
+                        key={todo.id}
+                        draggableId={todo.id.toString()}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <TodoItemComponent
+                              todoItem={todo}
+                              key={todo.id}
+                              onTodoItemChangeStatus={
+                                props.onTodoItemChangeStatus
+                              }
+                              onTodoItemChangeIsFavourite={
+                                props.onTodoItemChangeIsFavourite
+                              }
+                              onTodoItemDelete={props.onTodoItemDelete}
+                              labels={props.labels}
+                              labelsOnTodos={
+                                props.labelsOnTodos?.filter(
+                                  (labelOnTodo) =>
+                                    labelOnTodo.todoId === todo.id
+                                ) || []
+                              }
+                              onLabelOnTodoChange={props.onLabelOnTodoChange}
+                              onLabelDelete={props.onLabelDelete}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                  {provided.placeholder}
+                </div>
+              </ul>
+            </div>
+          )}
+        </Droppable>
+      </div>
     </div>
   );
 };

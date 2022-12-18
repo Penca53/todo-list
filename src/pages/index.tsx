@@ -401,33 +401,39 @@ const Home: NextPage = () => {
               {selectedTodoGroup?.name || session?.user.name}
             </h2>
 
-            <label
-              htmlFor="create-new-todo-modal"
-              className="modal-button btn btn-primary cursor-pointer"
-            >
-              Create Todo
-            </label>
+            <div className="flex ">
+              <div className="btn-group">
+                <label
+                  htmlFor="create-new-todo-modal"
+                  className="modal-button btn btn-outline cursor-pointer"
+                >
+                  Create Todo
+                </label>
 
-            <label
-              htmlFor="create-new-label-modal"
-              className="modal-button btn btn-outline cursor-pointer"
-            >
-              Create Label
-            </label>
+                <label
+                  htmlFor="create-new-label-modal"
+                  className="modal-button btn btn-outline cursor-pointer"
+                >
+                  Create Label
+                </label>
 
-            <label
-              htmlFor="create-new-category-modal"
-              className="modal-button btn btn-outline cursor-pointer"
-            >
-              Create Category
-            </label>
+                <label
+                  htmlFor="create-new-category-modal"
+                  className="modal-button btn btn-outline cursor-pointer"
+                >
+                  Create Category
+                </label>
+              </div>
 
-            <label
-              htmlFor="share-todo-group-modal"
-              className="modal-button btn btn-outline cursor-pointer"
-            >
-              Share Group
-            </label>
+              <div className="px-3">
+                <label
+                  htmlFor="share-todo-group-modal"
+                  className="modal-button btn btn-outline cursor-pointer"
+                >
+                  Share Group
+                </label>
+              </div>
+            </div>
 
             {selectedTodoGroup && (
               <button
