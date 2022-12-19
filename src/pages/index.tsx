@@ -362,7 +362,7 @@ const Home: NextPage = () => {
   return (
     <Layout>
       <div className="flex h-full">
-        <div className="w-96 overflow-y-scroll border-r border-gray-500 p-4">
+        <div className="w-96   overflow-y-scroll border-r border-gray-500 p-4">
           <ul className="mt-4">
             {getTodoGroups.isLoading ? (
               "Loading..."

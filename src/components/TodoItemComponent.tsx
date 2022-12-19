@@ -39,8 +39,8 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
   return (
     <li className="relative mt-2 rounded">
       <div className="w-full rounded-xl bg-primary pb-2 shadow-xl">
-        <div className="flex h-24 items-center justify-between">
-          <div className="flex basis-3/4 items-center justify-between gap-6 break-words pl-6 pt-2 pb-3 pr-3">
+        <div className="flex h-24 items-center justify-between gap-3 px-6">
+          <div className="flex basis-3/4 items-center justify-between gap-6 break-words pt-2 pb-3">
             <input
               type={"checkbox"}
               // TODO: allow more than boolean values
@@ -59,7 +59,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
             </div>
           </div>
 
-          <div className="flex basis-1/4 items-center justify-between gap-3 pr-3 pt-2 pb-3">
+          <div className="flex basis-1/4 items-center justify-between gap-3 pt-2 pb-3">
             <button
               className={
                 "btn btn-circle btn-ghost mt-1 justify-self-center " +
@@ -82,7 +82,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
 
             <button
               className={
-                "btn btn-square btn-outline btn-error " +
+                "btn btn-outline btn-error btn-square " +
                 (isDeletingTodo ? " loading" : null)
               }
               onClick={() => {

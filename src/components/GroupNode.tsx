@@ -54,9 +54,11 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
           onClick={() => props.onGroupClick(props.groupNode.item)}
           className="btn btn-sm h-12 grow justify-start border-none bg-transparent pl-0 hover:bg-transparent"
         >
-          {props.groupNode.item
-            ? props.groupNode.item.name
-            : session?.user.name}
+          <p className="max-w-[128px] overflow-hidden text-ellipsis">
+            {props.groupNode.item
+              ? props.groupNode.item.name
+              : session?.user.name}
+          </p>
         </button>
 
         <div className="flex items-center">
