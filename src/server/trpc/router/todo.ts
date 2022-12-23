@@ -106,6 +106,11 @@ export const todoRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      console.log(input);
+
+      if (input.id === input.afterId) {
+        return;
+      }
       // Remove
       const todo = await ctx.prisma.todo.findFirstOrThrow({
         where: {
@@ -113,13 +118,24 @@ export const todoRouter = router({
         },
       });
 
-      const next = await ctx.prisma.todo.findFirstOrThrow({
+      const next = await ctx.prisma.todo.findFirst({
         where: {
           prevTodoId: todo.id,
         },
       });
+      console.log("1", next);
 
       if (next) {
+        await ctx.prisma.todo.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            prevTodoId: null,
+          },
+        });
+        console.log("2.1");
+
         await ctx.prisma.todo.update({
           where: {
             id: next.id,
@@ -128,19 +144,34 @@ export const todoRouter = router({
             prevTodoId: todo.prevTodoId,
           },
         });
+        console.log("2.2");
       }
 
       // Insert
 
-      // Update next.prev
-      await ctx.prisma.todo.update({
+      const nextPrev = await ctx.prisma.todo.findFirst({
         where: {
-          prevTodoId: input.afterId || undefined,
-        },
-        data: {
-          prevTodoId: todo.id,
+          prevTodoId: input.afterId,
+          todoGroupId: todo.todoGroupId,
         },
       });
+
+      console.log(nextPrev);
+
+      // Update next.prev
+      await ctx.prisma.todo
+        .update({
+          where: {
+            id: nextPrev?.id,
+          },
+          data: {
+            prevTodoId: todo.id,
+          },
+        })
+        // Moving element to beginning or end of list
+        .catch(() => {});
+
+      console.log("3");
 
       // Update self
       return ctx.prisma.todo.update({

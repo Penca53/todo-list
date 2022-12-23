@@ -9,7 +9,7 @@ interface CategoryComponentProps {
   category: Category | null;
   onCategoryDelete: (item: Category) => Promise<void>;
 
-  todoItems: Todo[];
+  todoHead: TodoListNode;
   onTodoItemChangeIsFavourite: (item: Todo) => void;
   onTodoItemChangeStatus: (item: Todo, status: boolean) => void;
   onTodoItemDelete: (item: Todo) => Promise<void>;
@@ -36,6 +36,18 @@ const Draggable = dynamic(
   },
   { ssr: false }
 );
+
+const listToArray = (todoHead: TodoListNode) => {
+  const res: Todo[] = [];
+
+  let curr: TodoListNode | null = todoHead;
+  while (curr && curr.item) {
+    res.push(curr.item);
+    curr = curr.next;
+  }
+
+  return res;
+};
 
 const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
   const [isDeletingCategory, setIsDeletingCategory] = useState(false);
@@ -95,7 +107,7 @@ const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
             >
               <ul className="mt-4">
                 <div>
-                  {props.todoItems.map((todo, index) => {
+                  {listToArray(props.todoHead).map((todo, index) => {
                     return (
                       <Draggable
                         key={todo.id}
