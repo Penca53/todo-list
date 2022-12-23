@@ -3,6 +3,7 @@ import { Todo, Category, Label, LabelsOnTodos } from "@prisma/client";
 import TodoItemComponent from "../components/TodoItemComponent";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { TodoListNode } from "../../types/Todo";
 
 interface CategoryComponentProps {
   category: Category | null;
@@ -84,9 +85,7 @@ const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
       </div>
       <div className="px-4">
         <Droppable
-          droppableId={
-            props.category === null ? "-1" : props.category!.id.toString()
-          }
+          droppableId={props.category ? props.category.id.toString() : "-1"}
         >
           {(provided) => (
             <div

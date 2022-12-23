@@ -88,13 +88,67 @@ export const todoRouter = router({
       })
     )
     .mutation(({ ctx, input }) => {
-      console.log(input.categoryId);
       return ctx.prisma.todo.update({
         where: {
           id: input.id,
         },
         data: {
           categoryId: input.categoryId,
+        },
+      });
+    }),
+
+  updateTodoPosition: protectedProcedure
+    .input(
+      z.object({
+        id: z.number().int(),
+        afterId: z.number().int().nullish(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Remove
+      const todo = await ctx.prisma.todo.findFirstOrThrow({
+        where: {
+          id: input.id,
+        },
+      });
+
+      const next = await ctx.prisma.todo.findFirstOrThrow({
+        where: {
+          prevTodoId: todo.id,
+        },
+      });
+
+      if (next) {
+        await ctx.prisma.todo.update({
+          where: {
+            id: next.id,
+          },
+          data: {
+            prevTodoId: todo.prevTodoId,
+          },
+        });
+      }
+
+      // Insert
+
+      // Update next.prev
+      await ctx.prisma.todo.update({
+        where: {
+          prevTodoId: input.afterId || undefined,
+        },
+        data: {
+          prevTodoId: todo.id,
+        },
+      });
+
+      // Update self
+      return ctx.prisma.todo.update({
+        where: {
+          id: todo.id,
+        },
+        data: {
+          prevTodoId: input.afterId,
         },
       });
     }),
