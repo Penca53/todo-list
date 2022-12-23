@@ -169,7 +169,7 @@ export const todoRouter = router({
           },
         })
         // Moving element to beginning or end of list
-        .catch();
+        .catch(() => console.log("Begin or end of list"));
 
       console.log("3");
 
