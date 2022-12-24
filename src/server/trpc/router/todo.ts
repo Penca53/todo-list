@@ -18,8 +18,15 @@ export const todoRouter = router({
         categoryId: z.number().int().nullish(),
       })
     )
-    .mutation(({ ctx, input }) => {
-      return ctx.prisma.todo.create({
+    .mutation(async ({ ctx, input }) => {
+      const next = await ctx.prisma.todo.findFirst({
+        where: {
+          prevTodoId: null,
+          todoGroupId: input.todoGroupId,
+        },
+      });
+
+      const todo = await ctx.prisma.todo.create({
         data: {
           name: input.name,
           description: input.description,
@@ -28,8 +35,22 @@ export const todoRouter = router({
           userId: ctx.session.user.id,
           todoGroupId: input.todoGroupId,
           categoryId: input.categoryId,
+          prevTodoId: null,
         },
       });
+
+      if (next) {
+        await ctx.prisma.todo.update({
+          where: {
+            id: next.id,
+          },
+          data: {
+            prevTodoId: todo.id,
+          },
+        });
+      }
+
+      return todo;
     }),
   deleteTodo: protectedProcedure
     .input(
@@ -80,34 +101,15 @@ export const todoRouter = router({
       });
     }),
 
-  updateTodoCategory: protectedProcedure
-    .input(
-      z.object({
-        id: z.number().int(),
-        categoryId: z.number().int().nullish(),
-      })
-    )
-    .mutation(({ ctx, input }) => {
-      return ctx.prisma.todo.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          categoryId: input.categoryId,
-        },
-      });
-    }),
-
   updateTodoPosition: protectedProcedure
     .input(
       z.object({
         id: z.number().int(),
-        afterId: z.number().int().nullish(),
+        afterId: z.number().int().nullable(),
+        toCategoryId: z.number().int().nullable(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log(input);
-
       if (input.id === input.afterId) {
         return;
       }
@@ -123,7 +125,6 @@ export const todoRouter = router({
           prevTodoId: todo.id,
         },
       });
-      console.log("1", next);
 
       if (next) {
         await ctx.prisma.todo.update({
@@ -134,7 +135,6 @@ export const todoRouter = router({
             prevTodoId: null,
           },
         });
-        console.log("2.1");
 
         await ctx.prisma.todo.update({
           where: {
@@ -144,25 +144,22 @@ export const todoRouter = router({
             prevTodoId: todo.prevTodoId,
           },
         });
-        console.log("2.2");
       }
 
       // Insert
-
-      const nextPrev = await ctx.prisma.todo.findFirst({
+      const afterNext = await ctx.prisma.todo.findFirst({
         where: {
           prevTodoId: input.afterId,
           todoGroupId: todo.todoGroupId,
+          categoryId: input.toCategoryId,
         },
       });
 
-      console.log(nextPrev);
-
-      // Update next.prev
+      // Update afterNext.prev with todo
       await ctx.prisma.todo
         .update({
           where: {
-            id: nextPrev?.id,
+            id: afterNext?.id,
           },
           data: {
             prevTodoId: todo.id,
@@ -171,15 +168,14 @@ export const todoRouter = router({
         // Moving element to beginning or end of list
         .catch(() => console.log("Begin or end of list"));
 
-      console.log("3");
-
-      // Update self
+      // Update todo.prev
       return ctx.prisma.todo.update({
         where: {
           id: todo.id,
         },
         data: {
           prevTodoId: input.afterId,
+          categoryId: input.toCategoryId,
         },
       });
     }),

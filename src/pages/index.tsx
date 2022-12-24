@@ -2,20 +2,13 @@ import { trpc } from "../utils/trpc";
 import type { NextPage } from "next";
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
-import TodoItemComponent from "../components/TodoItemComponent";
 import CategoryComponent from "../components/CategoryComponent";
-import {
-  Todo,
-  TodoGroup,
-  Label,
-  LabelsOnTodos,
-  Category,
-} from "@prisma/client";
+import { Todo, TodoGroup, Label, Category } from "@prisma/client";
 import { GroupTreeNode, TodoListNode } from "../../types/Todo";
 import GroupNode from "../components/GroupNode";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
-import { DropResult, ResponderProvided } from "@hello-pangea/dnd";
+import { DropResult } from "@hello-pangea/dnd";
 
 const DragDropContext = dynamic(
   async () => {
@@ -25,23 +18,8 @@ const DragDropContext = dynamic(
   { ssr: false }
 );
 
-const Droppable = dynamic(
-  async () => {
-    const mod = await import("@hello-pangea/dnd");
-    return mod.Droppable;
-  },
-  { ssr: false }
-);
-const Draggable = dynamic(
-  async () => {
-    const mod = await import("@hello-pangea/dnd");
-    return mod.Draggable;
-  },
-  { ssr: false }
-);
-
 const Home: NextPage = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   const getTodos = trpc.todo.getTodos.useQuery();
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
@@ -55,41 +33,7 @@ const Home: NextPage = () => {
   const deleteTodo = trpc.todo.deleteTodo.useMutation();
   const updateTodoStatus = trpc.todo.updateTodoStatus.useMutation();
   const updateTodoFavourite = trpc.todo.updateTodoFavourite.useMutation();
-  const updateTodoCategory = trpc.todo.updateTodoCategory.useMutation();
-  const updateTodoPosition = trpc.todo.updateTodoPosition
-    .useMutation
-    /*{
-    // When mutate is called:
-    onMutate: async ({ id, afterId }) => {
-      // Cancel any outgoing refetches
-      // (so they don't overwrite our optimistic update)
-      await trpc.useContext().todo.getTodos.cancel();
-
-      // Snapshot the previous value
-      const previousTodos = getTodos.data;
-
-      // Optimistically update to the new value
-      //trpc.useContext().todo.getTodos.setData((old) => [...old, newTodo]);
-
-      const newItems = [...getTodos.data];
-      const [removed] = newItems.splice(result.source.index, 1);
-      newItems.splice(result.destination.index, 0, removed!);
-      getTodos.data = newItems;
-
-      // Return a context object with the snapshotted value
-      return { previousTodos };
-    },
-    // If the mutation fails,
-    // use the context returned from onMutate to roll back
-    onError: (err, newTodo, context) => {
-      trpc.useContext().todo.getTodos.setData(context?.previousTodos);
-    },
-    // Always refetch after error or success:
-    onSettled: () => {
-      trpc.useContext().todo.getTodos.invalidate();
-    },
-  }*/
-    ();
+  const updateTodoPosition = trpc.todo.updateTodoPosition.useMutation();
 
   const getLabels = trpc.label.getLabels.useQuery();
   const createLabel = trpc.label.createLabel.useMutation();
@@ -103,7 +47,6 @@ const Home: NextPage = () => {
   const createCategory = trpc.category.createCategory.useMutation();
   const deleteCategory = trpc.category.deleteCategory.useMutation();
 
-  //const [todos, setTodos] = useState<TodoModel[]>([]);
   const [addTodoName, setAddTodoName] = useState<string | null>(null);
   const [addTodoDescription, setAddTodoDescription] = useState<string | null>(
     null
@@ -133,40 +76,54 @@ const Home: NextPage = () => {
   const [isShareTodoGroupModalOpen, setIsShareTodoGroupModalOpen] =
     useState(false);
   const [isSharingTodoGroup, setIsSharingTodoGroup] = useState(false);
-  const [groupIdToCategoryIdToTodoHead, setGroupIdToCategoryIdToTodoHead] =
-    useState<Map<TodoGroup | null, Map<Category | null, TodoListNode>>>();
-  const [categoryIdToCategory, setCategoryIdToCategory] =
-    useState<Map<number, Category>>();
+
+  interface Column {
+    category: Category | null;
+    todoItems: Todo[];
+  }
+
+  const [categoryColumns, setCategoryColumns] = useState<Map<number, Column>>(
+    new Map<number, Column>()
+  );
 
   useEffect(() => {
-    if (
-      !getTodos.isLoading &&
-      getTodos.isSuccess &&
-      !getTodoGroups.isLoading &&
-      getTodoGroups.isSuccess &&
-      !getCategories.isLoading &&
-      getCategories.isSuccess
-    ) {
-      const map = createTodoLists(
-        getTodos.data,
-        getTodoGroups.data,
-        getCategories.data
-      );
-      console.log(getTodos.data.length);
-      setGroupIdToCategoryIdToTodoHead(map);
-
-      const map2 = new Map<number, Category>();
-      for (const category of getCategories.data) {
-        map2.set(category.id, category);
-      }
-
-      // IMPORTANT! Map uses objects, so selectedGroup needs to change along with the new data
-      setSelectedTodoGroup(
-        getTodoGroups.data.find((item) => item.id === selectedTodoGroup?.id) ||
-          null
+    if (getTodos.data && getCategories.data) {
+      setCategoryColumns(
+        buildColumns(
+          getTodos.data,
+          selectedTodoGroup?.id || -1,
+          getCategories.data
+        )
       );
     }
-  }, [getTodos.data, getCategories.data, getTodoGroups.data]);
+  }, [getTodos.data, selectedTodoGroup, getCategories.data]);
+
+  const listToArray = (todoHead: TodoListNode) => {
+    const res: Todo[] = [];
+
+    let curr: TodoListNode | null = todoHead;
+    while (curr && curr.item) {
+      res.push(curr.item);
+      curr = curr.next;
+    }
+
+    return res;
+  };
+
+  const buildColumns = (
+    todos: Todo[],
+    todoGroup: number,
+    categories: Category[]
+  ) => {
+    const columnsAsMap = createTodoColumns(todos, todoGroup, categories);
+
+    const res = new Map<number, Column>();
+    columnsAsMap.forEach((head, category) => {
+      res.set(category?.id || -1, { category, todoItems: listToArray(head) });
+    });
+
+    return res;
+  };
 
   const handleTodoItemChangeIsFavourite = (item: Todo) => {
     // Prediction
@@ -188,18 +145,6 @@ const Home: NextPage = () => {
       id: item.id,
       status: item.status,
     });
-  };
-
-  const handleTodoItemChangeCategory = (
-    todoId: number,
-    newCategoryId: number | null
-  ) => {
-    updateTodoCategory
-      .mutateAsync({
-        id: todoId,
-        categoryId: newCategoryId,
-      })
-      .then(() => getTodos.refetch());
   };
 
   const handleTodoItemDelete = (item: Todo): Promise<void> => {
@@ -399,61 +344,32 @@ const Home: NextPage = () => {
     return root;
   };
 
-  const createTodoLists = (
+  const createTodoColumns = (
     todos: Todo[],
-    groups: TodoGroup[],
-    categories: Category[]
-  ): Map<TodoGroup | null, Map<Category | null, TodoListNode>> => {
-    const heads = new Map<
-      TodoGroup | null,
-      Map<Category | null, TodoListNode>
-    >();
-
-    heads.set(
-      null,
-      createTodoHeads(
-        todos,
-        null,
-        categories.filter((category) => category.todoGroupId == null)
-      )
-    );
-
-    for (const group of groups) {
-      heads.set(
-        group,
-        createTodoHeads(
-          todos,
-          group,
-          categories.filter((category) => category.todoGroupId == group.id)
-        )
-      );
-    }
-
-    return heads;
-  };
-  const createTodoHeads = (
-    todos: Todo[],
-    group: TodoGroup | null,
+    group: number,
     categories: Category[]
   ): Map<Category | null, TodoListNode> => {
     const heads = new Map<Category | null, TodoListNode>();
 
     heads.set(
       null,
-      createTodoHead(
+      createTodoColumn(
         todos.filter(
-          (todo) => todo.categoryId === null && todo.todoGroupId === group?.id
+          (todo) => todo.categoryId === null && todo.todoGroupId === group
         )
       )
     );
 
     for (const category of categories) {
+      if (category.todoGroupId !== group) {
+        continue;
+      }
       heads.set(
         category,
-        createTodoHead(
+        createTodoColumn(
           todos.filter(
             (todo) =>
-              todo.categoryId === category.id && todo.todoGroupId === group?.id
+              todo.categoryId === category.id && todo.todoGroupId === group
           )
         )
       );
@@ -461,7 +377,7 @@ const Home: NextPage = () => {
 
     return heads;
   };
-  const createTodoHead = (todos: Todo[]): TodoListNode => {
+  const createTodoColumn = (todos: Todo[]): TodoListNode => {
     let head: TodoListNode = { item: null, prev: null, next: null };
     const nodesMap = new Map<number, TodoListNode>();
 
@@ -498,53 +414,87 @@ const Home: NextPage = () => {
     if (!getTodos.data) {
       return;
     }
+
     if (!result.destination) {
       return;
     }
-
-    const listToArray = (todoHead: TodoListNode) => {
-      const res: Todo[] = [];
-
-      let curr: TodoListNode | null = todoHead;
-      while (curr && curr.item) {
-        res.push(curr.item);
-        curr = curr.next;
-      }
-
-      return res;
-    };
-
     const sourceId = parseInt(result.source.droppableId);
-    const categoryId = sourceId !== -1 ? sourceId : -1;
-    const category = categoryIdToCategory?.get(categoryId) || null;
-    const todoHead = groupIdToCategoryIdToTodoHead
-      ?.get(selectedTodoGroup)
-      ?.get(category);
+    const destinationId = parseInt(result.destination.droppableId);
+    if (sourceId !== destinationId) {
+      const sourceColumn = categoryColumns.get(sourceId);
+      if (!sourceColumn) {
+        return;
+      }
+      const destColumn = categoryColumns.get(destinationId);
+      if (!destColumn) {
+        return;
+      }
+      const sourceItems = [...sourceColumn.todoItems];
+      const destItems = [...destColumn.todoItems];
+      const [removed] = sourceItems.splice(result.source.index, 1);
+      if (!removed) {
+        return;
+      }
+      const after = destItems[result.destination.index - 1];
+      destItems.splice(result.destination.index, 0, removed);
 
-    if (!todoHead) {
-      return;
+      const newCategoryColumns = new Map<number, Column>();
+      categoryColumns.forEach((value, key) =>
+        newCategoryColumns.set(key, { ...value })
+      );
+
+      newCategoryColumns.set(sourceId, {
+        ...sourceColumn,
+        todoItems: sourceItems,
+      });
+
+      newCategoryColumns.set(destinationId, {
+        ...destColumn,
+        todoItems: destItems,
+      });
+
+      setCategoryColumns(newCategoryColumns);
+
+      updateTodoPosition
+        .mutateAsync({
+          id: parseInt(result.draggableId),
+          afterId: after?.id || null,
+          toCategoryId: destinationId !== -1 ? destinationId : null,
+        })
+        .then(() => getTodos.refetch());
+    } else {
+      const column = categoryColumns.get(sourceId);
+      if (!column) {
+        return;
+      }
+      const copiedItems = [...column.todoItems];
+      const [removed] = copiedItems.splice(result.source.index, 1);
+      if (!removed) {
+        return;
+      }
+      const after = copiedItems[result.destination.index - 1];
+      copiedItems.splice(result.destination.index, 0, removed);
+
+      const newCategoryColumns = new Map<number, Column>();
+      categoryColumns.forEach((value, key) =>
+        newCategoryColumns.set(key, { ...value })
+      );
+
+      newCategoryColumns.set(sourceId, {
+        ...column,
+        todoItems: copiedItems,
+      });
+
+      setCategoryColumns(newCategoryColumns);
+
+      updateTodoPosition
+        .mutateAsync({
+          id: parseInt(result.draggableId),
+          afterId: after?.id || null,
+          toCategoryId: destinationId !== -1 ? destinationId : null,
+        })
+        .then(() => getTodos.refetch());
     }
-
-    const array = listToArray(todoHead);
-
-    const prev =
-      array[
-        result.destination.index -
-          (result.source.index > result.destination.index ? 1 : 0)
-      ];
-    const afterId = prev?.id || null;
-
-    updateTodoPosition
-      .mutateAsync({
-        id: parseInt(result.draggableId),
-        afterId,
-      })
-      .then(() => getTodos.refetch());
-  };
-
-  const test = () => {
-    console.log(groupIdToCategoryIdToTodoHead?.get(selectedTodoGroup));
-    return true;
   };
 
   return (
@@ -640,34 +590,29 @@ const Home: NextPage = () => {
           <DragDropContext onDragEnd={(res) => onDragEnd(res)}>
             <div className="flex max-h-[90%] min-h-[90%] w-full overflow-x-auto pb-4">
               <div className="flex gap-2">
-                {test() &&
-                  groupIdToCategoryIdToTodoHead &&
-                  groupIdToCategoryIdToTodoHead.get(selectedTodoGroup) &&
-                  Array.from(
-                    groupIdToCategoryIdToTodoHead!.get(selectedTodoGroup)!
-                  ).map(([category, todoHead]) => (
-                    <CategoryComponent
-                      key={category?.id || -1}
-                      category={category}
-                      todoHead={todoHead}
-                      labels={
-                        getLabels.data?.filter(
-                          (label) =>
-                            (!label.todoGroupId && !selectedTodoGroup) ||
-                            label.todoGroupId === selectedTodoGroup?.id
-                        ) || []
-                      }
-                      labelsOnTodos={getLabelsOnTodos.data || []}
-                      onCategoryDelete={handleDeleteCategoryClick}
-                      onLabelDelete={handleLabelDelete}
-                      onLabelOnTodoChange={handleLabelOnTodoChange}
-                      onTodoItemChangeIsFavourite={
-                        handleTodoItemChangeIsFavourite
-                      }
-                      onTodoItemChangeStatus={handleTodoItemChangeStatus}
-                      onTodoItemDelete={handleTodoItemDelete}
-                    />
-                  ))}
+                {Array.from(categoryColumns).map(([, column]) => (
+                  <CategoryComponent
+                    key={column.category?.id || -1}
+                    category={column.category}
+                    todoItems={column.todoItems}
+                    labels={
+                      getLabels.data?.filter(
+                        (label) =>
+                          (!label.todoGroupId && !selectedTodoGroup) ||
+                          label.todoGroupId === selectedTodoGroup?.id
+                      ) || []
+                    }
+                    labelsOnTodos={getLabelsOnTodos.data || []}
+                    onCategoryDelete={handleDeleteCategoryClick}
+                    onLabelDelete={handleLabelDelete}
+                    onLabelOnTodoChange={handleLabelOnTodoChange}
+                    onTodoItemChangeIsFavourite={
+                      handleTodoItemChangeIsFavourite
+                    }
+                    onTodoItemChangeStatus={handleTodoItemChangeStatus}
+                    onTodoItemDelete={handleTodoItemDelete}
+                  />
+                ))}
               </div>
             </div>
           </DragDropContext>

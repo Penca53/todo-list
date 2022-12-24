@@ -1,5 +1,4 @@
-import { trpc } from "../utils/trpc";
-import { Todo, Label, LabelsOnTodos } from "@prisma/client";
+import { Todo, Label } from "@prisma/client";
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
 

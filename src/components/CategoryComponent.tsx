@@ -1,15 +1,13 @@
-import { trpc } from "../utils/trpc";
 import { Todo, Category, Label, LabelsOnTodos } from "@prisma/client";
 import TodoItemComponent from "../components/TodoItemComponent";
 import { useState } from "react";
 import dynamic from "next/dynamic";
-import { TodoListNode } from "../../types/Todo";
 
 interface CategoryComponentProps {
   category: Category | null;
   onCategoryDelete: (item: Category) => Promise<void>;
 
-  todoHead: TodoListNode;
+  todoItems: Todo[];
   onTodoItemChangeIsFavourite: (item: Todo) => void;
   onTodoItemChangeStatus: (item: Todo, status: boolean) => void;
   onTodoItemDelete: (item: Todo) => Promise<void>;
@@ -37,23 +35,11 @@ const Draggable = dynamic(
   { ssr: false }
 );
 
-const listToArray = (todoHead: TodoListNode) => {
-  const res: Todo[] = [];
-
-  let curr: TodoListNode | null = todoHead;
-  while (curr && curr.item) {
-    res.push(curr.item);
-    curr = curr.next;
-  }
-
-  return res;
-};
-
 const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
   const [isDeletingCategory, setIsDeletingCategory] = useState(false);
 
   return (
-    <div className="mt-4 w-[28rem] flex-col justify-items-start overflow-hidden overflow-y-auto rounded-lg  border border-gray-500 p-4">
+    <div className="mt-4 flex w-[28rem] flex-col justify-items-start overflow-hidden overflow-y-auto rounded-lg  border border-gray-500 p-4">
       <div className="px-4">
         <div className="mb-4 flex h-14 justify-between border-b border-gray-500 pb-2">
           <h2 className="w-64 self-end overflow-hidden text-ellipsis text-2xl">
@@ -95,7 +81,7 @@ const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
           )}
         </div>
       </div>
-      <div className="px-4">
+      <div className="flex-1 px-4">
         <Droppable
           droppableId={props.category ? props.category.id.toString() : "-1"}
         >
@@ -107,7 +93,7 @@ const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
             >
               <ul className="mt-4">
                 <div>
-                  {listToArray(props.todoHead).map((todo, index) => {
+                  {props.todoItems.map((todo, index) => {
                     return (
                       <Draggable
                         key={todo.id}

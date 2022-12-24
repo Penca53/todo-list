@@ -1,5 +1,4 @@
-import { trpc } from "../utils/trpc";
-import { Todo, Label, LabelsOnTodos, Category } from "@prisma/client";
+import { Todo, Label, LabelsOnTodos } from "@prisma/client";
 import LabelComponent from "./LabelComponent";
 import { useState } from "react";
 import useDebounce from "../hooks/useDebounce";
@@ -62,7 +61,7 @@ const TodoItemComponent: React.FC<TodoItemComponentProps> = (props) => {
           <div className="flex basis-1/4 items-center justify-between gap-3 pt-2 pb-3">
             <button
               className={
-                "btn btn-ghost btn-circle mt-1 justify-self-center " +
+                "btn btn-circle btn-ghost mt-1 justify-self-center " +
                 (props.todoItem.isFavourite
                   ? "stroke-yellow-400"
                   : "stroke-gray-400")

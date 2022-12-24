@@ -1,5 +1,5 @@
 import { trpc } from "../utils/trpc";
-import { Todo, TodoGroup, Label } from "@prisma/client";
+import { TodoGroup } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { GroupTreeNode } from "../../types/Todo";
 import { useState } from "react";
@@ -11,7 +11,7 @@ interface GroupNodeProps {
 }
 
 const GroupNode: React.FC<GroupNodeProps> = (props) => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [addGroupName, setAddGroupName] = useState<string | null>();
 
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
@@ -31,14 +31,6 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
       })
       .then(() => getTodoGroups.refetch())
       .finally(() => setIsAddingGroup(false));
-  };
-
-  const handleDeleteGroup = () => {
-    /*
-    deleteTodoGroup
-      .mutateAsync({ id: props.groupNode.item?.id})
-      .then(() => getTodoGroups.refetch());
-  */
   };
 
   const onAddGroupKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
