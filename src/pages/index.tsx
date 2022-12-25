@@ -59,6 +59,8 @@ const Home: NextPage = () => {
 
   const [isAddTodoModalOpen, setIsAddTodoModalOpen] = useState(false);
   const [isAddingTodo, setIsAddingTodo] = useState(false);
+  const [isAddingTodoFromCategory, setIsAddingTodoFromCategory] =
+    useState<Category | null>(null);
 
   const [isDeletingTodoGroup, setIsDeletingTodoGroup] = useState(false);
 
@@ -97,6 +99,12 @@ const Home: NextPage = () => {
       );
     }
   }, [getTodos.data, selectedTodoGroup, getCategories.data]);
+
+  useEffect(() => {
+    setAddTodoName(null);
+    setAddTodoDescription(null);
+    setAddTodoStatus(false);
+  }, [isAddTodoModalOpen]);
 
   const listToArray = (todoHead: TodoListNode) => {
     const res: Todo[] = [];
@@ -182,6 +190,7 @@ const Home: NextPage = () => {
 
     if (!addTodoName || !addTodoDescription) {
       setIsAddingTodo(false);
+      setIsAddingTodoFromCategory(null);
       return;
     }
 
@@ -190,11 +199,13 @@ const Home: NextPage = () => {
         name: addTodoName,
         description: addTodoDescription,
         status: addTodoStatus,
-        todoGroupId: selectedTodoGroup?.id,
+        todoGroupId: selectedTodoGroup?.id || null,
+        categoryId: isAddingTodoFromCategory?.id || null,
       })
       .then(() => getTodos.refetch())
       .finally(() => {
         setIsAddingTodo(false);
+        setIsAddingTodoFromCategory(null);
         setIsAddTodoModalOpen(false);
       });
   };
@@ -281,6 +292,11 @@ const Home: NextPage = () => {
         setIsAddingCategory(false);
         setIsAddCategoryModalOpen(false);
       });
+  };
+
+  const handleCategoryCreateTodoClick = (item: Category) => {
+    setIsAddingTodoFromCategory(item);
+    setIsAddTodoModalOpen(true);
   };
 
   const handleDeleteCategoryClick = (item: Category) => {
@@ -603,6 +619,7 @@ const Home: NextPage = () => {
                       ) || []
                     }
                     labelsOnTodos={getLabelsOnTodos.data || []}
+                    onCategoryCreateTodo={handleCategoryCreateTodoClick}
                     onCategoryDelete={handleDeleteCategoryClick}
                     onLabelDelete={handleLabelDelete}
                     onLabelOnTodoChange={handleLabelOnTodoChange}
@@ -624,9 +641,6 @@ const Home: NextPage = () => {
             checked={isAddTodoModalOpen}
             onChange={(e) => {
               setIsAddTodoModalOpen(e.target.checked);
-              setAddTodoName(null);
-              setAddTodoDescription(null);
-              setAddTodoStatus(false);
             }}
           />
           <label htmlFor="create-new-todo-modal" className="modal">

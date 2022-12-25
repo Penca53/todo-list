@@ -14,14 +14,15 @@ export const todoRouter = router({
         name: z.string(),
         description: z.string(),
         status: z.boolean().default(false),
-        todoGroupId: z.number().int().nullish(),
-        categoryId: z.number().int().nullish(),
+        todoGroupId: z.number().int().nullable(),
+        categoryId: z.number().int().nullable(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const next = await ctx.prisma.todo.findFirst({
+      const head = await ctx.prisma.todo.findFirst({
         where: {
           prevTodoId: null,
+          categoryId: input.categoryId,
           todoGroupId: input.todoGroupId,
         },
       });
@@ -39,10 +40,10 @@ export const todoRouter = router({
         },
       });
 
-      if (next) {
+      if (head) {
         await ctx.prisma.todo.update({
           where: {
-            id: next.id,
+            id: head.id,
           },
           data: {
             prevTodoId: todo.id,
@@ -58,12 +59,46 @@ export const todoRouter = router({
         id: z.number().int(),
       })
     )
-    .mutation(({ ctx, input }) => {
-      return ctx.prisma.todo.delete({
+    .mutation(async ({ ctx, input }) => {
+      const todo = await ctx.prisma.todo.findFirst({
         where: {
           id: input.id,
         },
       });
+      if (!todo) {
+        return;
+      }
+
+      const next = await ctx.prisma.todo.findFirst({
+        where: {
+          prevTodoId: todo.id,
+        },
+      });
+
+      const deleteTodo = await ctx.prisma.todo.delete({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (next) {
+        const prev = await ctx.prisma.todo.findUnique({
+          where: {
+            id: todo.prevTodoId || -1,
+          },
+        });
+
+        await ctx.prisma.todo.update({
+          where: {
+            id: next.id,
+          },
+          data: {
+            prevTodoId: prev?.id || null,
+          },
+        });
+      }
+
+      return deleteTodo;
     }),
   updateTodoStatus: protectedProcedure
     .input(

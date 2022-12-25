@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 
 interface CategoryComponentProps {
   category: Category | null;
+  onCategoryCreateTodo: (item: Category) => void;
   onCategoryDelete: (item: Category) => Promise<void>;
 
   todoItems: Todo[];
@@ -47,38 +48,62 @@ const CategoryComponent: React.FC<CategoryComponentProps> = (props) => {
               ? "Not assigned todos"
               : props.category.name}
           </h2>
-          {props.category && (
+          <div className="flex gap-2">
             <button
-              className={
-                "btn btn-outline btn-error btn-square scale-90 " +
-                (isDeletingCategory ? " loading" : null)
-              }
+              className={"btn btn-outline btn-square scale-90"}
               onClick={() => {
-                setIsDeletingCategory(true);
-                props
-                  .onCategoryDelete(props.category!)
-                  .then(() => setIsDeletingCategory(false));
+                props.onCategoryCreateTodo(props.category!);
               }}
             >
-              {!isDeletingCategory && (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  display="none"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              )}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="h-6 w-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4.5v15m7.5-7.5h-15"
+                />
+              </svg>
             </button>
-          )}
+
+            {props.category && (
+              <button
+                className={
+                  "btn btn-outline btn-error btn-square scale-90 " +
+                  (isDeletingCategory ? " loading" : null)
+                }
+                onClick={() => {
+                  setIsDeletingCategory(true);
+                  props
+                    .onCategoryDelete(props.category!)
+                    .then(() => setIsDeletingCategory(false));
+                }}
+              >
+                {!isDeletingCategory && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    display="none"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                )}
+              </button>
+            )}
+          </div>
         </div>
       </div>
       <div className="flex-1 px-4">
