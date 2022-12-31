@@ -40,12 +40,14 @@ export const todoGroupShareRouter = router({
           throw new Error("Not reachable");
         }
 
-        const sharePromise = ctx.prisma.todoGroupShare.create({
-          data: {
-            sharedToId: user.id,
-            todoGroupId: currentTodoGroupId,
-          },
-        });
+        const sharePromise = ctx.prisma.todoGroupShare
+          .create({
+            data: {
+              sharedToId: user.id,
+              todoGroupId: currentTodoGroupId,
+            },
+          })
+          .catch(() => console.warn("Share already created"));
         promises.push(sharePromise);
 
         const children = await ctx.prisma.todoGroup.findMany({

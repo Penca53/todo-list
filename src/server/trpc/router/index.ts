@@ -7,6 +7,7 @@ import { labelRouter } from "./label";
 import { labelsOnTodosRouter } from "./labelsOnTodos";
 import { todoGroupShareRouter } from "./todoGroupShare";
 import { categoryRouter } from "./category";
+import { userRouter } from "./user";
 
 export const appRouter = router({
   todo: todoRouter,
@@ -15,6 +16,7 @@ export const appRouter = router({
   labelsOnTodos: labelsOnTodosRouter,
   todoGroupShare: todoGroupShareRouter,
   category: categoryRouter,
+  user: userRouter,
 });
 
 // export type definition of API

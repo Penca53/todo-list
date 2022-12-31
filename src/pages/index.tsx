@@ -333,15 +333,73 @@ const Home: NextPage = () => {
     const nodesMap = new Map<number, GroupTreeNode>();
 
     for (const group of todoGroups) {
-      let parent = null;
+      let parent: GroupTreeNode | null = null;
       if (group.parentGroupId === null) {
         parent = root;
       } else {
-        parent = nodesMap.get(group.parentGroupId);
+        parent = nodesMap.get(group.parentGroupId) || null;
         if (!parent) {
           parent = { item: null, parent: null, children: [] };
           nodesMap.set(group.parentGroupId, parent);
         }
+      }
+
+      let node = nodesMap.get(group.id);
+      if (!node) {
+        node = {
+          item: group,
+          parent: parent,
+          children: [],
+        };
+      }
+
+      parent.children.push(node);
+      nodesMap.set(group.id, node);
+    }
+
+    return root;
+  };
+
+  const createSharedGroupTrees = (todoGroups: TodoGroup[]) => {
+    const userToSharedTodos = new Map<string, TodoGroup[]>();
+    for (const group of todoGroups) {
+      if (!userToSharedTodos.has(group.userId)) {
+        userToSharedTodos.set(group.userId, []);
+      }
+      userToSharedTodos.get(group.userId)?.push(group);
+    }
+
+    const roots = new Map<string, GroupTreeNode>();
+    userToSharedTodos.forEach((value, key) => {
+      roots.set(key, createSharedGroupTree(value));
+    });
+
+    return roots;
+  };
+
+  const createSharedGroupTree = (todoGroups: TodoGroup[]): GroupTreeNode => {
+    const root: GroupTreeNode = { item: null, parent: null, children: [] };
+
+    const sharedTodos = new Set<number>();
+    for (const group of todoGroups) {
+      sharedTodos.add(group.id);
+    }
+
+    const nodesMap = new Map<number, GroupTreeNode>();
+
+    for (const group of todoGroups) {
+      let parent: GroupTreeNode | null = null;
+      if (
+        group.parentGroupId !== null &&
+        sharedTodos.has(group.parentGroupId)
+      ) {
+        parent = nodesMap.get(group.parentGroupId) || null;
+        if (!parent) {
+          parent = { item: null, parent: null, children: [] };
+          nodesMap.set(group.parentGroupId, parent);
+        }
+      } else {
+        parent = root;
       }
 
       let node = nodesMap.get(group.id);
@@ -527,26 +585,33 @@ const Home: NextPage = () => {
                 groupNode={createGroupTree(getTodoGroups.data)}
                 height={0}
                 onGroupClick={handleTodoGroupNodeClick}
+                ownerId={null}
               />
             ) : null}
           </ul>
 
           <ul className="mt-4">
-            {getSharedTodoGroups.isLoading ? (
-              "Loading..."
-            ) : getSharedTodoGroups.isError ? (
-              "Error!"
-            ) : getSharedTodoGroups.data ? (
-              <GroupNode
-                height={0}
-                groupNode={createGroupTree(
-                  getSharedTodoGroups.data.map((item) => item.todoGroup)
-                )}
-                onGroupClick={() => {
-                  console.log("Not Implemented");
-                }}
-              />
-            ) : null}
+            {getSharedTodoGroups.isLoading
+              ? "Loading..."
+              : getSharedTodoGroups.isError
+              ? "Error!"
+              : getSharedTodoGroups.data
+              ? Array.from(
+                  createSharedGroupTrees(
+                    getSharedTodoGroups.data.map((item) => item.todoGroup)
+                  )
+                ).map(([ownerId, root]) => (
+                  <GroupNode
+                    key={ownerId}
+                    ownerId={ownerId}
+                    height={0}
+                    groupNode={root}
+                    onGroupClick={() => {
+                      console.log("Not Implemented");
+                    }}
+                  />
+                ))
+              : null}
           </ul>
         </div>
         <div className="flex-1 overflow-y-hidden border-l border-gray-500 p-4">

@@ -1,11 +1,12 @@
 import { trpc } from "../utils/trpc";
-import { TodoGroup } from "@prisma/client";
+import { TodoGroup, User } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { GroupTreeNode } from "../../types/Todo";
 import { useState } from "react";
 
 interface GroupNodeProps {
   groupNode: GroupTreeNode;
+  ownerId: string | null;
   height: number;
   onGroupClick: (group: TodoGroup | null) => void;
 }
@@ -16,6 +17,9 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
 
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
+  const getUserById = trpc.user.getUserById.useQuery({
+    id: props.ownerId || "",
+  });
 
   const [collapsed, setCollapsed] = useState("block");
   const [isAddingGroup, setIsAddingGroup] = useState(false);
@@ -39,6 +43,18 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
     }
   };
 
+  const groupDisplayName = () => {
+    if (props.groupNode.item) {
+      return props.groupNode.item.name;
+    }
+
+    if (props.ownerId) {
+      return getUserById.data?.name;
+    }
+
+    return session?.user.name;
+  };
+
   return (
     <div className="ml-6">
       <div className="group btn-ghost btn-sm flex h-12 items-center justify-between rounded-lg pl-2 pr-0 ">
@@ -47,9 +63,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
           className="btn btn-sm h-12 grow justify-start border-none bg-transparent pl-0 hover:bg-transparent"
         >
           <p className="max-w-[128px] overflow-hidden text-ellipsis">
-            {props.groupNode.item
-              ? props.groupNode.item.name
-              : session?.user.name}
+            {groupDisplayName()}
           </p>
         </button>
 
@@ -133,6 +147,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
             groupNode={child}
             height={props.height + 1}
             onGroupClick={props.onGroupClick}
+            ownerId={null}
           />
         ))}
       </div>
