@@ -1,12 +1,30 @@
 import { router, publicProcedure, protectedProcedure } from "../trpc";
 import { z } from "zod";
+import { Todo } from "@prisma/client";
 
 export const todoRouter = router({
-  getTodos: protectedProcedure.query(({ ctx }) => {
-    return ctx.prisma.todo.findMany({
+  getTodos: protectedProcedure.query(async ({ ctx }) => {
+    let ownTodos = await ctx.prisma.todo.findMany({
       where: { userId: ctx.session.user.id },
       orderBy: { id: "asc" },
     });
+
+    const sharedTodoGroups = await ctx.prisma.todoGroupShare.findMany({
+      where: { sharedToId: ctx.session.user.id },
+    });
+
+    let sharedToMeTodos: Todo[] = [];
+    for (const group of sharedTodoGroups) {
+      const ts = await ctx.prisma.todo.findMany({
+        where: { todoGroupId: group.todoGroupId },
+        orderBy: { id: "asc" },
+      });
+
+      sharedToMeTodos = sharedToMeTodos.concat(ts);
+    }
+
+    ownTodos = ownTodos.concat(sharedToMeTodos);
+    return ownTodos;
   }),
   createTodo: protectedProcedure
     .input(

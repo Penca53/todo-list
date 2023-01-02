@@ -606,9 +606,7 @@ const Home: NextPage = () => {
                     ownerId={ownerId}
                     height={0}
                     groupNode={root}
-                    onGroupClick={() => {
-                      console.log("Not Implemented");
-                    }}
+                    onGroupClick={handleTodoGroupNodeClick}
                   />
                 ))
               : null}
