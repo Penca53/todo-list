@@ -6,9 +6,9 @@ import { useState } from "react";
 
 interface GroupNodeProps {
   groupNode: GroupTreeNode;
-  ownerId: string | null;
+  ownerId: string;
   height: number;
-  onGroupClick: (group: TodoGroup | null) => void;
+  onGroupClick: (group: TodoGroup | null, ownerId: string) => void;
 }
 
 const GroupNode: React.FC<GroupNodeProps> = (props) => {
@@ -18,7 +18,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
   const getTodoGroups = trpc.todoGroup.getTodoGroups.useQuery();
   const createTodoGroup = trpc.todoGroup.createTodoGroups.useMutation();
   const getUserById = trpc.user.getUserById.useQuery({
-    id: props.ownerId || "",
+    id: props.ownerId,
   });
 
   const [collapsed, setCollapsed] = useState("block");
@@ -59,7 +59,9 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
     <div className="ml-6">
       <div className="group btn-ghost btn-sm flex h-12 items-center justify-between rounded-lg pl-2 pr-0 ">
         <button
-          onClick={() => props.onGroupClick(props.groupNode.item)}
+          onClick={() =>
+            props.onGroupClick(props.groupNode.item, props.ownerId)
+          }
           className="btn btn-sm h-12 grow justify-start border-none bg-transparent pl-0 hover:bg-transparent"
         >
           <p className="max-w-[128px] overflow-hidden text-ellipsis">
@@ -147,7 +149,7 @@ const GroupNode: React.FC<GroupNodeProps> = (props) => {
             groupNode={child}
             height={props.height + 1}
             onGroupClick={props.onGroupClick}
-            ownerId={null}
+            ownerId={props.ownerId}
           />
         ))}
       </div>

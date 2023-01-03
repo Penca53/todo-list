@@ -26,6 +26,7 @@ const Home: NextPage = () => {
   const deleteTodoGroup = trpc.todoGroup.deleteTodoGroup.useMutation();
   const getSharedTodoGroups =
     trpc.todoGroupShare.getSharedTodoGroups.useQuery();
+
   const shareTodoGroup = trpc.todoGroupShare.shareTodoGroup.useMutation();
   const unshareTodoGroup = trpc.todoGroupShare.unshareTodoGroup.useMutation();
 
@@ -56,6 +57,9 @@ const Home: NextPage = () => {
   const [selectedTodoGroup, setSelectedTodoGroup] = useState<TodoGroup | null>(
     null
   );
+  const [selectedTodoGroupOwner, setSelectedTodoGroupOwner] = useState<
+    string | null
+  >(null);
 
   const [isAddTodoModalOpen, setIsAddTodoModalOpen] = useState(false);
   const [isAddingTodo, setIsAddingTodo] = useState(false);
@@ -78,6 +82,10 @@ const Home: NextPage = () => {
   const [isShareTodoGroupModalOpen, setIsShareTodoGroupModalOpen] =
     useState(false);
   const [isSharingTodoGroup, setIsSharingTodoGroup] = useState(false);
+
+  const getUserById = trpc.user.getUserById.useQuery({
+    id: selectedTodoGroupOwner || session?.user.id,
+  });
 
   interface Column {
     category: Category | null;
@@ -305,7 +313,8 @@ const Home: NextPage = () => {
     });
   };
 
-  const handleTodoGroupNodeClick = (group: TodoGroup | null) => {
+  const handleTodoGroupNodeClick = (group: TodoGroup | null, owner: string) => {
+    setSelectedTodoGroupOwner(owner);
     setSelectedTodoGroup(group);
   };
 
@@ -585,7 +594,7 @@ const Home: NextPage = () => {
                 groupNode={createGroupTree(getTodoGroups.data)}
                 height={0}
                 onGroupClick={handleTodoGroupNodeClick}
-                ownerId={null}
+                ownerId={session?.user.id}
               />
             ) : null}
           </ul>
@@ -615,10 +624,10 @@ const Home: NextPage = () => {
         <div className="flex-1 overflow-y-hidden border-l border-gray-500 p-4">
           <div className="flex w-full items-center gap-4 border-b pt-2 pb-4">
             <h2 className="w-64 overflow-hidden text-ellipsis text-2xl">
-              {selectedTodoGroup?.name || session?.user.name}
+              {selectedTodoGroup?.name || getUserById.data?.name}
             </h2>
 
-            <div className="flex ">
+            <div className="flex">
               <div className="btn-group">
                 <label
                   htmlFor="create-new-todo-modal"
